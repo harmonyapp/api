@@ -5,7 +5,7 @@
   "scripts": {
     "compile": "rm -rf dist && tsc --rootDir .",
     "start": "npm run compile && node ./dist/src",
-    "test": "npm run lint && jest --config=jest.config.js tests",
+    "test": "npm run lint",
     "lint": "eslint src",
     "lint:fix": "eslint --fix src"
   },
