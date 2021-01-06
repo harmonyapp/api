@@ -6,11 +6,34 @@ import snowflake from "../helpers/snowflake";
 export type IMessageModel = Model<IMessageDocument>;
 
 export interface IMessageDocument extends Document {
+    /**
+     * The ID of the document
+     */
+    id: string;
+    /**
+     * The content of the message
+     */
     content: string;
+    /**
+     * The ID of the user who sent this message
+     */
     author: string;
+    /**
+     * The channel that this message was sent to
+     */
     channel: string;
+    /**
+     * The server that this message belongs to
+     */
     server: string;
+    /**
+     * The date this document was created at
+     */
     createdAt: Date;
+    /**
+     * The date this document was updated at
+     */
+    updatedAt: Date;
 }
 
 const messageSchema = new Schema({

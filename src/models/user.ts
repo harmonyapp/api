@@ -11,23 +11,59 @@ import FieldError from "../errors/FieldError";
 import { UsernameRegex } from "../util/Constants";
 
 interface toJSONOptions extends DocumentToObjectOptions {
+    /**
+     * Whether the returned object should contain only public properties
+     */
     isPublic?: boolean;
 }
 
 export interface IUserModel extends Model<IUserDocument> {
+    /**
+     * Find a user by their username (non case sensitive)
+     */
     findByUsername(username: string): Promise<IUserDocument | null>;
+    /**
+     * Find a user by their credentials
+     */
     findByCredentials(username: string, password: string): Promise<IUserDocument | false>;
 }
 
 export interface IUserDocument extends Document {
+    /**
+     * The ID of this document
+     */
     id: string;
+    /**
+     * The username of the user
+     */
     username: string;
-    email?: string;
+    /**
+     * The email of the user, if applicable
+     */
+    email: string;
+    /**
+     * The hash of the password of the user
+     */
     password: string;
+    /**
+     * The flags that this user has
+     */
     flags: string;
+    /**
+     * The ID of the settings document of this user
+     */
     settings: string;
+    /**
+     * The date this document was created at
+     */
     createdAt: Date;
+    /**
+     * The date this document was updated at
+     */
     updatedAt: Date;
+    /**
+     * Create a session for this user
+     */
     createSession(): Promise<ISessionDocument>;
     toJSON(options?: toJSONOptions): Record<string, unknown>;
 }
@@ -45,6 +81,7 @@ const userSchema = new Schema({
     },
     email: {
         type: Schema.Types.String,
+        required: true,
         unique: true,
         trim: true,
         lowercase: true

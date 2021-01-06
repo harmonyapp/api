@@ -6,8 +6,30 @@ import snowflake from "../helpers/snowflake";
 export type IRoleModel = Model<IRoleDocument>;
 
 export interface IRoleDocument extends Document {
+    /**
+     * The ID of the document
+     */
+    id: string;
+    /**
+     * The name of this role
+     */
+    name: string;
+    /**
+     * The bits representing the users permissions
+     */
+    permissions: string;
+    /**
+     * The server that this role belongs to
+     */
     server: string;
+    /**
+     * The date this document was created at
+     */
     createdAt: Date;
+    /**
+     * The date this document was updated at
+     */
+    updatedAt: Date;
 }
 
 const roleSchema = new Schema({

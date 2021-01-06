@@ -6,11 +6,33 @@ import FieldError from "../errors/FieldError";
 export type IMemberModel = Model<IMemberDocument>;
 
 export interface IMemberDocument extends Document {
+    /**
+     * The ID of the document
+     */
+    id: string;
+    /**
+     * The server that this member belongs to
+     */
     server: string;
+    /**
+     * The user that this member 'extends'
+     */
     user: string;
+    /**
+     * The bits representing the users permissions
+     */
     permissions: string;
+    /**
+     * The ID of the roles that have been assigned to this member
+     */
     roles: string[];
+    /**
+     * The nickname of this member, if applicable
+     */
     nickname?: string;
+    /**
+     * The date this document was created at
+     */
     createdAt: Date;
 }
 

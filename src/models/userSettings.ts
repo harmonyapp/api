@@ -4,10 +4,6 @@ import snowflake from "../helpers/snowflake";
 
 export type IUserSettingsModel = Model<IUserSettingsDocument>;
 
-interface toJSONOptions extends DocumentToObjectOptions {
-    isUnlocked?: boolean;
-}
-
 export interface IUserSettingsDocument extends Document {
     /**
      * The ID of the document
@@ -25,8 +21,6 @@ export interface IUserSettingsDocument extends Document {
      * The date this document was updated at
      */
     updatedAt: Date;
-
-    toJSON(options?: toJSONOptions): Record<string, unknown>;
 }
 
 const userSettingsSchema = new Schema({

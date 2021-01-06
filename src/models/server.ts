@@ -7,9 +7,26 @@ import Channel from "./channel";
 export type IServerModel = Model<IServerDocument>;
 
 export interface IServerDocument extends Document {
+    /**
+     * The ID of the document
+     */
+    id: string;
+    /**
+     * The name of this server
+     */
     name: string;
+    /**
+     * The ID of the user who owns this server
+     */
     owner: string;
+    /**
+     * The date this document was created at
+     */
     createdAt: Date;
+    /**
+     * The date this document was updated at
+     */
+    updatedAt: Date;
 }
 
 const serverSchema = new Schema({

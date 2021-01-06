@@ -7,13 +7,38 @@ import snowflake from "../helpers/snowflake";
 export type IChannelModel = Model<IChannelDocument>;
 
 export interface IChannelDocument extends Document {
+    /**
+     * The ID of the document
+     */
     id: string;
+    /**
+     * The name of the channel
+     */
     name: string;
+    /**
+     * The topic of the channel
+     */
     topic?: string;
+    /**
+     * Whether this channel is marked as NSFW or not
+     */
     nsfw: boolean;
+    /**
+     * The server that this channel belongs to
+     */
     server: string;
+    /**
+     * The position of this channel
+     */
     position: number;
+    /**
+     * The date this document was created at
+     */
     createdAt: Date;
+    /**
+     * The date this document was updated at
+     */
+    updatedAt: Date;
 }
 
 const channelSchema = new Schema({
