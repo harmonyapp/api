@@ -7,7 +7,7 @@ class BaseError extends Error {
         throw new Error("No compiler provided for error.");
     }
 
-    public setHttpStatusCode(httpStatusCode: HttpStatusCode) {
+    public setHttpStatusCode(httpStatusCode: HttpStatusCode): this {
         this.httpStatusCode = httpStatusCode;
 
         return this;

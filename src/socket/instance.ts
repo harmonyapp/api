@@ -6,7 +6,7 @@ import socketEvents from "./events";
 
 let IO_INSTANCE: SocketServer | undefined = undefined;
 
-export function initialize(server: HttpServer) {
+export function initialize(server: HttpServer): void {
     IO_INSTANCE = new SocketServer(server);
 
     const pubClient = new RedisClient({ host: process.env.REDIS_HOST, port: +process.env.REDIS_PORT });

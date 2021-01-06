@@ -95,11 +95,11 @@ messageSchema.pre("validate", function (next) {
     next();
 });
 
-messageSchema.pre("save", async function (next) {
-    const document = this as IMessageDocument;
+// messageSchema.pre("save", async function (next) {
+//     const document = this as IMessageDocument;
 
-    next();
-});
+//     next();
+// });
 
 const Message: IMessageModel = mongoose.model<IMessageDocument, IMessageModel>("Message", messageSchema);
 

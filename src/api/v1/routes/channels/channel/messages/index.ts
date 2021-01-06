@@ -1,5 +1,4 @@
 import { Router } from "express";
-import MessagesController from "../../../../controllers/channels/channel/messages/MessagesController";
 import authenticate from "../../../../middlewares/authenticate";
 
 const router = Router();

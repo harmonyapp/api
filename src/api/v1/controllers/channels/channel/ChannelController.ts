@@ -1,11 +1,7 @@
-import config from "../../../../../../config/config";
 import { Response, Request, NextFunction } from "express";
 import { matchedData } from "express-validator";
 import BaseController from "../../BaseController";
 import Server from "../../../../../models/server";
-import Member from "../../../../../models/member";
-import HttpStatusCode from "../../../../../interfaces/HttpStatusCode";
-import Channel from "../../../../../models/channel";
 import GenericError from "../../../../../errors/GenericError";
 import ErrorMessages from "../../../../../errors/Messages";
 import { ControllerReturnPromise } from "../../../../../interfaces/ControllerReturn";
@@ -43,7 +39,7 @@ class ChannelController extends BaseController {
         try {
             await channel.remove();
         } catch (error) {
-            return next(error)
+            return next(error);
         }
 
         res.send({ channel });

@@ -9,3 +9,5 @@ class Permission {
         return (this.permission & permission) === permission;
     }
 }
+
+export default Permission;

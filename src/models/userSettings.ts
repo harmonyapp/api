@@ -1,5 +1,4 @@
-import config from "../../config/config";
-import mongoose, { Schema, Model, Document, DocumentToObjectOptions } from "mongoose";
+import mongoose, { Schema, Model, Document } from "mongoose";
 import snowflake from "../helpers/snowflake";
 
 export type IUserSettingsModel = Model<IUserSettingsDocument>;

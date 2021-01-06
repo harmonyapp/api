@@ -74,7 +74,7 @@ class ServerController extends BaseController {
         }
     }
 
-    public static async deleteServer(req: Request, res: Response, next: NextFunction) {
+    public static async deleteServer(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
         const server = req.bus.server;
         const member = req.bus.member;
 

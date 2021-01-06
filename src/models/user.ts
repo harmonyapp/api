@@ -193,7 +193,7 @@ userSchema.pre("validate", async function (next) {
     }
 
     if (!password) {
-        fieldErrors.addError("password", "Password is required")
+        fieldErrors.addError("password", "Password is required");
     }
 
     if (fieldErrors.hasErrors()) {

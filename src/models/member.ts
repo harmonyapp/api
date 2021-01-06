@@ -93,11 +93,11 @@ memberSchema.pre("validate", async function (next) {
     next();
 });
 
-memberSchema.pre("save", async function (next) {
-    const document = this as IMemberDocument;
+// memberSchema.pre("save", async function (next) {
+//     const document = this as IMemberDocument;
 
-    next();
-});
+//     next();
+// });
 
 const Member: IMemberModel = mongoose.model<IMemberDocument, IMemberModel>("Member", memberSchema);
 

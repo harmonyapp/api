@@ -3,7 +3,7 @@ import BaseError from "./BaseError";
 class GenericError extends BaseError {
     public error: string;
 
-    get message() {
+    get message(): string {
         return this.error;
     }
 
@@ -13,11 +13,11 @@ class GenericError extends BaseError {
         this.error = error;
     }
 
-    public setError(error: string) {
+    public setError(error: string): void {
         this.error = error;
     }
 
-    public compile() {
+    public compile(): string {
         return this.error;
     }
 }

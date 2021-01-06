@@ -3,7 +3,7 @@ import GenericError from "../../../errors/GenericError";
 import HttpStatusCode from "../../../interfaces/HttpStatusCode";
 import User from "../../../models/user";
 
-const findUser = async (req: Request, res: Response, next: NextFunction) => {
+const findUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const userID = req.params.userID;
     const user = await User.findOne({ _id: userID });
 
@@ -14,6 +14,6 @@ const findUser = async (req: Request, res: Response, next: NextFunction) => {
     req.bus.user = user;
 
     next();
-}
+};
 
 export default findUser;

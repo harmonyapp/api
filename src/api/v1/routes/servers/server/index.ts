@@ -18,7 +18,7 @@ router.get("/channels",
 router.post("/channels",
     authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
     ServerController.createChannel
-)
+);
 
 router.patch("/",
     authenticate({ required: true, allowApplications: false }),

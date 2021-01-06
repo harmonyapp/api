@@ -1,6 +1,4 @@
 import mongoose, { Schema, Model, Document } from "mongoose";
-import config from "../../config/config";
-import FieldError from "../errors/FieldError";
 import snowflake from "../helpers/snowflake";
 
 export type IRoleModel = Model<IRoleDocument>;
@@ -60,17 +58,17 @@ roleSchema.methods.toJSON = function () {
     return role.toObject();
 };
 
-roleSchema.pre("validate", function (next) {
-    const document = this as IRoleDocument;
+// roleSchema.pre("validate", function (next) {
+//     const document = this as IRoleDocument;
 
-    next();
-});
+//     next();
+// });
 
-roleSchema.pre("save", async function (next) {
-    const document = this as IRoleDocument;
+// roleSchema.pre("save", async function (next) {
+//     const document = this as IRoleDocument;
 
-    next();
-});
+//     next();
+// });
 
 const Role: IRoleModel = mongoose.model<IRoleDocument, IRoleModel>("Role", roleSchema);
 

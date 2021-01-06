@@ -4,7 +4,7 @@ import HttpStatusCode from "../../../interfaces/HttpStatusCode";
 import Member from "../../../models/member";
 import Server from "../../../models/server";
 
-const findServer = async (req: Request, res: Response, next: NextFunction) => {
+const findServer = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const serverID = req.params.serverID;
     const server = await Server.findOne({ _id: serverID });
 
@@ -22,6 +22,6 @@ const findServer = async (req: Request, res: Response, next: NextFunction) => {
     req.bus.member = member;
 
     next();
-}
+};
 
 export default findServer;

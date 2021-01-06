@@ -15,7 +15,7 @@ class FieldError extends BaseError {
         return this.errors.length > 0;
     }
 
-    public addError(field: string, error: string, overwrite: boolean = false): void {
+    public addError(field: string, error: string, overwrite = false): void {
         const existing = this.errors.find((error) => error.field === field);
 
         if (existing) {
@@ -25,7 +25,7 @@ class FieldError extends BaseError {
         }
     }
 
-    public compile() {
+    public compile(): { field: string, error: string }[] {
         return this.errors;
     }
 }

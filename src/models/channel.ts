@@ -133,11 +133,11 @@ channelSchema.pre("validate", function (next) {
     next();
 });
 
-channelSchema.pre("save", async function (next) {
-    const document = this as IChannelDocument;
+// channelSchema.pre("save", async function (next) {
+//     const document = this as IChannelDocument;
 
-    next();
-});
+//     next();
+// });
 
 const Channel: IChannelModel = mongoose.model<IChannelDocument, IChannelModel>("Channel", channelSchema);
 
