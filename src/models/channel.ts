@@ -1,0 +1,119 @@
+import mongoose, { Schema, Model, Document } from "mongoose";
+import config from "../../config/config";
+import FieldError from "../errors/FieldError";
+import ErrorMessages from "../errors/Messages";
+import snowflake from "../helpers/snowflake";
+
+export type IChannelModel = Model<IChannelDocument>;
+
+export interface IChannelDocument extends Document {
+    id: string;
+    name: string;
+    topic?: string;
+    nsfw: boolean;
+    server: string;
+    position: number;
+    createdAt: Date;
+}
+
+const channelSchema = new Schema({
+    _id: {
+        type: Schema.Types.String,
+        default: () => snowflake()
+    },
+    name: {
+        type: Schema.Types.String,
+        required: true,
+        trim: true,
+        lowercase: true
+    },
+    topic: {
+        type: Schema.Types.String,
+        trim: true
+    },
+    nsfw: {
+        type: Schema.Types.Boolean,
+        required: true,
+        default: false
+    },
+    server: {
+        type: Schema.Types.String,
+        required: true,
+        ref: "Server"
+    },
+    position: {
+        type: Schema.Types.Number,
+        required: true
+    }
+}, {
+    timestamps: true
+});
+
+channelSchema.methods.toJSON = function () {
+    const channel = this as IChannelDocument;
+
+    const newObject = {
+        id: channel.id,
+        name: channel.name,
+        topic: channel.topic,
+        nsfw: channel.nsfw,
+        server: channel.server,
+        position: channel.position
+    };
+
+    return newObject;
+};
+
+channelSchema.pre("validate", function (next) {
+    const document = this as IChannelDocument;
+
+    const name = document.name;
+    const topic = document.topic;
+    const nsfw = document.nsfw;
+
+    // TODO: Add validation for position when it becomes a thing
+
+    const channelValidation = config.getProperties().validation.channel;
+
+    if (!name) {
+        return next(new FieldError("name", ErrorMessages.REQUIRED_FIELD));
+    }
+
+    if (name.length < channelValidation.name.minlength || name.length > channelValidation.name.maxlength) {
+        return next(new FieldError(
+            "name",
+            `Channel name must be between ${channelValidation.name.minlength} and ${channelValidation.name.maxlength} in length`
+        ));
+    }
+
+    if (!channelValidation.name.regex.test(name)) {
+        return next(new FieldError("name", "Invalid channel name"));
+    }
+
+
+    if (topic?.length && (topic.length < channelValidation.topic.minlength || topic.length > channelValidation.topic.maxlength)) {
+        return next(new FieldError(
+            "topic",
+            `Channel topic must be between ${channelValidation.topic.minlength} and ${channelValidation.topic.maxlength} in length`
+        ));
+    }
+
+    if (typeof nsfw !== "boolean") {
+        return next(new FieldError(
+            "nsfw",
+            `Channel topic must be between ${channelValidation.topic.minlength} and ${channelValidation.topic.maxlength} in length`
+        ));
+    }
+
+    next();
+});
+
+channelSchema.pre("save", async function (next) {
+    const document = this as IChannelDocument;
+
+    next();
+});
+
+const Channel: IChannelModel = mongoose.model<IChannelDocument, IChannelModel>("Channel", channelSchema);
+
+export default Channel;
