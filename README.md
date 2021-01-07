@@ -2,7 +2,7 @@
 
 Harmony is an open-source chat application, written in Node. You are allowed to self-host this API, but there is currently no real use for it since no client has been created yet. License applies.
 
-#### (WIP)
+#### Note: This project is a Work in Progress. API documentation will soon be available in the form of a Postman collection.
 
 ## Prerequisites
 1) Node
