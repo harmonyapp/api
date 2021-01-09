@@ -8,7 +8,7 @@ const findUser = async (req: Request, res: Response, next: NextFunction): Promis
     const user = await User.findOne({ _id: userID });
 
     if (!user) {
-        return next(new GenericError("Channel not found").setHttpStatusCode(HttpStatusCode.NOT_FOUND));
+        return next(new GenericError("User not found").setHttpStatusCode(HttpStatusCode.NOT_FOUND));
     }
 
     req.bus.user = user;

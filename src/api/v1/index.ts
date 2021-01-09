@@ -7,8 +7,8 @@ import applications from "./routes/applications";
 import HttpStatusCode from "../../interfaces/HttpStatusCode";
 import debug from "../../helpers/debug";
 import BaseError from "../../errors/BaseError";
-import { getIOInstance } from "../../socket/instance";
 import GenericError from "../../errors/GenericError";
+import { getIOInstance } from "../../socket/instance";
 
 const router = Router();
 

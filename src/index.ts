@@ -59,6 +59,11 @@ if (cluster.isMaster) {
 
     cluster.on("exit", (worker, code, signal) => {
         console.log(`Worker ${worker.id} died. Code: ${code}, signal: ${signal}`);
+
+        cluster.fork({
+            ...process.env,
+            WORKER_ID: worker.id
+        });
     });
 
     for (let i = 0; i < cpuCount; i++) {

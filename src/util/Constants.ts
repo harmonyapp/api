@@ -35,3 +35,10 @@ export const SocketEvents = {
 export const UserFlags = {
     DEVELOPER: 0x1
 };
+
+export const RelationshipTypes = {
+    FRIEND: 1 as 1,
+    BLOCK: 2 as 2,
+    INCOMING_FRIEND_REQUEST: 3 as 3,
+    OUTGOING_FRIEND_REQUEST: 4 as 4
+}
