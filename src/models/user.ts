@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 import mongoose, { Schema, Model, Document, DocumentToObjectOptions } from "mongoose";
 import snowflake from "../helpers/snowflake";
 import escapeRegex from "../helpers/escapeRegex";
-import scorePassword from "../helpers/scorePassword";
 import Session, { ISessionDocument } from "./session";
 import UserSettings from "./userSettings";
 import FieldError from "../errors/FieldError";
@@ -239,12 +238,8 @@ userSchema.pre("validate", async function (next) {
     // The minimum password length required is 6 characters, because anything less is too insecure
     // The maximum password length is 72 characters, because that's the length bcrypt truncates at
     if (document.isModified("password")) {
-        const score = scorePassword(document.password);
-
         if (password.length < 6 || password.length > 72) {
             fieldErrors.addError("password", "Password must be between 6 and 72 in length");
-        } else if (score <= 30) {
-            fieldErrors.addError("password", "Password is too weak");
         }
     }
 
