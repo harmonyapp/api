@@ -176,8 +176,6 @@ userSchema.methods.toJSON = function ({ isPublic = true } = {}) {
 userSchema.pre("validate", async function (next) {
     const document = this as IUserDocument;
 
-    const errors = [];
-
     const username = document.username;
     const email = document.email;
     const password = document.password;
@@ -250,7 +248,7 @@ userSchema.pre("validate", async function (next) {
         }
     }
 
-    if (errors.length) {
+    if (fieldErrors.hasErrors()) {
         return next(fieldErrors);
     }
 
