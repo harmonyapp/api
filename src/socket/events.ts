@@ -21,11 +21,11 @@ const socketEvents = (io: SocketServer): void => {
 
     io.on("connection", async (socket: SocketExtended) => {
         const user = socket.request.user;
-        const servers = await Member.find({ user: user.id }).populate("server").exec();
+        const members = await Member.find({ user: user.id }).populate("server").exec();
 
         const data = {
             user: user.toJSON(),
-            servers: servers.map((server) => server.toJSON())
+            servers: members.map((member) => member.server)
         };
 
         socket.emit(SocketEvents.READY, data);
