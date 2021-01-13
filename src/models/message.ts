@@ -1,6 +1,7 @@
 import mongoose, { Schema, Model, Document } from "mongoose";
 import config from "../../config/config";
 import FieldError from "../errors/FieldError";
+import ErrorMessages from "../errors/Messages";
 import snowflake from "../helpers/snowflake";
 
 export type IMessageModel = Model<IMessageDocument>;
@@ -82,6 +83,10 @@ messageSchema.pre("validate", function (next) {
     const document = this as IMessageDocument;
 
     const content = document.content;
+
+    if (!content) {
+        return next(new FieldError("content", ErrorMessages.REQUIRED_FIELD));
+    }
 
     const messageValidation = config.getProperties().validation.message;
 
