@@ -5,6 +5,8 @@ import Server from "../../../../../models/server";
 import GenericError from "../../../../../errors/GenericError";
 import ErrorMessages from "../../../../../errors/Messages";
 import { ControllerReturnPromise } from "../../../../../interfaces/ControllerReturn";
+import Invite from "../../../../../models/invite";
+import HttpStatusCode from "../../../../../interfaces/HttpStatusCode";
 
 class ChannelController extends BaseController {
     public static async getChannel(req: Request, res: Response): ControllerReturnPromise {
@@ -43,6 +45,24 @@ class ChannelController extends BaseController {
         }
 
         res.send({ channel });
+    }
+
+    public static async createInvite(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
+        const channel = req.bus.channel;
+
+        const invite = new Invite({
+            server: channel.server,
+            channel: channel.id,
+            user: req.user.id
+        });
+
+        try {
+            await invite.save();
+        } catch (error) {
+            return next(error);
+        }
+
+        return res.status(HttpStatusCode.CREATED).send({ invite });
     }
 }
 

@@ -17,6 +17,11 @@ router.patch("/",
     ChannelController.updateChannel
 );
 
+router.post("/invites",
+    authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
+    ChannelController.createInvite
+);
+
 router.use("/messages", messages);
 
 export default router;
