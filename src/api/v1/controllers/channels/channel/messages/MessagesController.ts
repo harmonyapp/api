@@ -83,6 +83,25 @@ class MessagesController extends BaseController {
 
         return res.send({ message });
     }
+
+    public static async createMessage(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
+        const { content } = req.body;
+
+        const message = new Message({
+            content: content,
+            author: req.user.id,
+            channel: req.bus.channel.id,
+            server: req.bus.channel.server
+        });
+
+        try {
+            await message.save();
+        } catch (error) {
+            return next(error);
+        }
+
+        return res.send({ message });
+    }
 }
 
 export default MessagesController;
