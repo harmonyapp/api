@@ -63,12 +63,8 @@ const inviteSchema = new Schema({
     timestamps: true
 });
 
-inviteSchema.methods.getPresentableObject = async function () {
+inviteSchema.methods.toJSON = function () {
     const invite = this as IInviteDocument;
-
-    await invite.populate("user").execPopulate();
-    await invite.populate("server").execPopulate();
-    await invite.populate("channel").execPopulate();
 
     const newObject = {
         id: invite.id,
