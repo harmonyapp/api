@@ -1,8 +1,4 @@
 import mongoose, { Schema, Model, Document } from "mongoose";
-import Server from "./server";
-import config from "../../config/config";
-import FieldError from "../errors/FieldError";
-import ErrorMessages from "../errors/Messages";
 import snowflake from "../helpers/snowflake";
 
 export type IInviteModel = Model<IInviteDocument>;

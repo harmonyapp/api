@@ -1,6 +1,6 @@
-import { Response, Request, NextFunction, raw } from "express";
+import { Response, Request, NextFunction } from "express";
 import BaseController from "../../../BaseController";
-import User, { IUserDocument } from "../../../../../../models/user";
+import User from "../../../../../../models/user";
 import Relationship from "../../../../../../models/relationship";
 import FieldError from "../../../../../../errors/FieldError";
 import GenericError from "../../../../../../errors/GenericError";
@@ -91,7 +91,7 @@ class MyRelationshipsController extends BaseController {
 
             await existingConcerningRelationship.save();
 
-            return res.status(HttpStatusCode.NO_CONTENT).send()
+            return res.status(HttpStatusCode.NO_CONTENT).send();
         } else {
             relationship.type = RelationshipTypes.OUTGOING_FRIEND_REQUEST;
 

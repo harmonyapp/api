@@ -37,8 +37,8 @@ export const UserFlags = {
 };
 
 export const RelationshipTypes = {
-    FRIEND: 1 as 1,
-    BLOCK: 2 as 2,
-    INCOMING_FRIEND_REQUEST: 3 as 3,
-    OUTGOING_FRIEND_REQUEST: 4 as 4
-}
+    FRIEND: 1 as const,
+    BLOCK: 2 as const,
+    INCOMING_FRIEND_REQUEST: 3 as const,
+    OUTGOING_FRIEND_REQUEST: 4 as const
+};
