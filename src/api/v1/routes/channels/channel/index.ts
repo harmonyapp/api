@@ -17,6 +17,11 @@ router.patch("/",
     ChannelController.updateChannel
 );
 
+router.delete("/",
+    authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
+    ChannelController.deleteChannel
+);
+
 router.post("/invites",
     authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
     ChannelController.createInvite
