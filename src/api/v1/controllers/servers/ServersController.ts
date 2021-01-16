@@ -9,9 +9,9 @@ import { ControllerReturnPromise } from "../../../../interfaces/ControllerReturn
 
 class ServersController extends BaseController {
     public static async getServers(req: Request, res: Response): ControllerReturnPromise {
-        const servers = await Server.find({ owner: req.user.id }).sort("-createdAt");
+        const members = await Member.find({ user: req.user.id }).populate("server").exec();
 
-        return res.send({ servers });
+        return res.send({ servers: members.map((member) => member.server) });
     }
 
     public static async getServerByID(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
