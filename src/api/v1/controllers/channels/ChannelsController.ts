@@ -27,10 +27,6 @@ class ChannelsController extends BaseController {
         const server = req.bus.server;
         const channel = req.bus.channel;
 
-        if (server.owner !== req.user.id) {
-            return next(new GenericError(ErrorMessages.MISSING_PERMISSIONS).setHttpStatusCode(HttpStatusCode.FORBIDDEN));
-        }
-
         try {
             await channel.remove();
         } catch (error) {

@@ -34,10 +34,6 @@ class ChannelController extends BaseController {
         const channel = req.bus.channel;
         const server = await Server.findOne({ id: channel.server });
 
-        if (req.user.id !== server.owner) {
-            return next(new GenericError(ErrorMessages.MISSING_PERMISSIONS));
-        }
-
         try {
             await channel.remove();
         } catch (error) {

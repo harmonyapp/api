@@ -21,10 +21,6 @@ class ServerController extends BaseController {
     public static async createChannel(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
         const server = req.bus.server;
 
-        if (server.owner !== req.user.id) {
-            return next(new GenericError(ErrorMessages.MISSING_PERMISSIONS).setHttpStatusCode(HttpStatusCode.FORBIDDEN));
-        }
-
         const existingChannels = await Channel.countDocuments({ server: req.bus.server.id });
         const maxChannels = 200;
 
@@ -56,10 +52,6 @@ class ServerController extends BaseController {
 
     public static async updateServer(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
         const server = req.bus.server;
-
-        if (server.owner !== req.user.id) {
-            return next(new GenericError(ErrorMessages.MISSING_PERMISSIONS).setHttpStatusCode(HttpStatusCode.FORBIDDEN));
-        }
 
         const serverData = matchedData(req);
 
