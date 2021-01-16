@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import auth from "./routes/auth";
 import users from "./routes/users";
+import invites from "./routes/invites";
 import servers from "./routes/servers";
 import channels from "./routes/channels";
 import applications from "./routes/applications";
@@ -27,6 +28,7 @@ router.use((req, res, next) => {
 // Base routes
 router.use("/auth", auth);
 router.use("/users", users);
+router.use("/invites", invites);
 router.use("/servers", servers);
 router.use("/channels", channels);
 router.use("/applications", applications);

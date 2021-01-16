@@ -1,4 +1,5 @@
 import mongoose, { Schema, Model, Document } from "mongoose";
+import random from "../helpers/random";
 import snowflake from "../helpers/snowflake";
 
 export type IInviteModel = Model<IInviteDocument>;
@@ -8,6 +9,10 @@ export interface IInviteDocument extends Document {
      * The ID of the document
      */
     id: string;
+    /**
+     * The code for this invite
+     */
+    code: string;
     /**
      * The user that created this invite
      */
@@ -39,6 +44,12 @@ const inviteSchema = new Schema({
         type: Schema.Types.String,
         default: () => snowflake()
     },
+    code: {
+        type: Schema.Types.String,
+        required: true,
+        unique: true,
+        default: () => random.alpha(12)
+    },
     user: {
         type: Schema.Types.String,
         required: true,
@@ -68,6 +79,7 @@ inviteSchema.methods.toJSON = function () {
 
     const newObject = {
         id: invite.id,
+        code: invite.code,
         user: invite.user,
         server: invite.server,
         channel: invite.channel,
@@ -77,11 +89,11 @@ inviteSchema.methods.toJSON = function () {
     return newObject;
 };
 
-inviteSchema.pre("validate", function (next) {
-    // const document = this as IInviteDocument;
+// inviteSchema.pre("validate", function (next) {
+//     // const document = this as IInviteDocument;
 
-    next();
-});
+//     next();
+// });
 
 // inviteSchema.pre("save", async function (next) {
 //     const document = this as IInviteDocument;

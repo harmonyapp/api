@@ -12,12 +12,17 @@ export const string = (length: number): string => {
     return _random(length, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890");
 };
 
+export const alpha = (length: number): string => {
+    return _random(length, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+};
+
 export const number = (length: number): string => {
     return _random(length, "1234567890");
 };
 
 const random = {
     string,
+    alpha,
     number
 };
 
