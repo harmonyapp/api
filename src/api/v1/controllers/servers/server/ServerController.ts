@@ -68,7 +68,6 @@ class ServerController extends BaseController {
 
     public static async deleteServer(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
         const server = req.bus.server;
-        const member = req.bus.member;
 
         if (server.owner !== req.user.id) {
             return next(new GenericError(ErrorMessages.MISSING_PERMISSIONS).setHttpStatusCode(HttpStatusCode.FORBIDDEN));
@@ -76,7 +75,6 @@ class ServerController extends BaseController {
 
         try {
             await server.remove();
-            await member.remove();
 
             return res.send({
                 success: true,

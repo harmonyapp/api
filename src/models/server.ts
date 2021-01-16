@@ -3,6 +3,7 @@ import config from "../../config/config";
 import FieldError from "../errors/FieldError";
 import snowflake from "../helpers/snowflake";
 import Channel from "./channel";
+import Member from "./member";
 
 export type IServerModel = Model<IServerDocument>;
 
@@ -90,6 +91,14 @@ serverSchema.pre("save", async function (next) {
     });
 
     await defaultChannel.save();
+
+    next();
+});
+
+serverSchema.pre("remove", async function (next) {
+    const document = this as IServerDocument;
+
+    await Member.deleteMany({ server: document.id });
 
     next();
 });
