@@ -14,6 +14,6 @@ const findInvite = async (req: Request, res: Response, next: NextFunction): Prom
     req.bus.invite = invite;
 
     return next();
-}
+};
 
 export default findInvite;

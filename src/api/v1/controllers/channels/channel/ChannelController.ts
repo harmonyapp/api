@@ -1,9 +1,6 @@
 import { Response, Request, NextFunction } from "express";
 import { matchedData } from "express-validator";
 import BaseController from "../../BaseController";
-import Server from "../../../../../models/server";
-import GenericError from "../../../../../errors/GenericError";
-import ErrorMessages from "../../../../../errors/Messages";
 import { ControllerReturnPromise } from "../../../../../interfaces/ControllerReturn";
 import Invite from "../../../../../models/invite";
 import HttpStatusCode from "../../../../../interfaces/HttpStatusCode";
@@ -32,7 +29,6 @@ class ChannelController extends BaseController {
 
     public static async deleteChannel(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
         const channel = req.bus.channel;
-        const server = await Server.findOne({ id: channel.server });
 
         try {
             await channel.remove();

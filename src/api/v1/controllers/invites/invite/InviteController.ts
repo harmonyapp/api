@@ -3,15 +3,16 @@ import Member from "../../../../../models/member";
 import BaseController from "../../BaseController";
 import GenericError from "../../../../../errors/GenericError";
 import HttpStatusCode from "../../../../../interfaces/HttpStatusCode";
+import { ControllerReturnPromise } from "../../../../../interfaces/ControllerReturn";
 
 class InviteController extends BaseController {
-    public static async getInvite(req: Request, res: Response) {
+    public static async getInvite(req: Request, res: Response): ControllerReturnPromise {
         const invite = req.bus.invite;
 
-        res.send({ invite });
+        return res.send({ invite });
     }
 
-    public static async useInvite(req: Request, res: Response, next: NextFunction) {
+    public static async useInvite(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
         const invite = req.bus.invite;
         const member = await Member.findOne({ server: invite.server, user: req.user.id });
 

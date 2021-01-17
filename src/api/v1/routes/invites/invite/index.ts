@@ -1,7 +1,5 @@
 import { Router } from "express";
-import serverPolicies from "../../../../../policies/serverPolicies";
 import InviteController from "../../../controllers/invites/invite/InviteController";
-import ServerController from "../../../controllers/servers/server/ServerController";
 import authenticate from "../../../middlewares/authenticate";
 
 const router = Router();
