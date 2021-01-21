@@ -28,8 +28,8 @@ export const ProjectRoot = path.join(process.cwd(), "/src");
 // };
 
 export const SocketEvents = {
-    READY: "ready",
-    SERVER_CREATE: "server_create",
+    READY: "READY",
+    SERVER_CREATE: "SERVER_CREATE",
 };
 
 export const UserFlags = {
