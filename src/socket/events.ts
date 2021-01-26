@@ -24,7 +24,7 @@ const socketEvents = (io: SocketServer): void => {
         const members = await Member.find({ user: user.id }).populate("server").exec();
 
         const data = {
-            user: user,
+            user: user.toJSON({ isPublic: false }),
             servers: members.map((member) => member.server)
         };
 
