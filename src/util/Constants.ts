@@ -1,4 +1,5 @@
 import path from "path";
+import PermissionString from "../interfaces/PermissionString";
 
 export const Scopes = [
     "account.read", "account.update",
@@ -20,12 +21,10 @@ export const ProjectRoot = path.join(process.cwd(), "/src");
  * 80
  */
 
-// To be determined
-
-// export const Permissions = {
-//     SEND_MESSAGES: 0x000001,
-//     VIEW_CHANNEL: 0x000002
-// };
+export const PermissionFlags = {
+    SEND_MESSAGES: 0x000001,
+    VIEW_CHANNEL: 0x000002
+} as { [key in PermissionString]: number; };
 
 export const SocketEvents = {
     READY: "READY",
