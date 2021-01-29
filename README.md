@@ -13,7 +13,7 @@ Harmony is an open-source chat application, written in Node. You are allowed to 
 ### Cloning the repository to your local machine
 
 ```bash
-git clone https://github.com/chris9740/harmony
+git clone https://github.com/harmonyapp/api.git
 ```
 
 ### Installing all packages
