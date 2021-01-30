@@ -5,7 +5,6 @@ import mongoose, { Schema, Model, Document, DocumentToObjectOptions } from "mong
 import snowflake from "../helpers/snowflake";
 import escapeRegex from "../helpers/escapeRegex";
 import Session, { ISessionDocument } from "./session";
-import UserSettings from "./userSettings";
 import FieldError from "../errors/FieldError";
 import { UsernameRegex } from "../util/Constants";
 
@@ -256,17 +255,6 @@ userSchema.pre("save", async function (next) {
     if (document.isModified("password")) {
         document.password = await bcrypt.hash(document.password, 10);
     }
-
-    if (document.isNew || !document.settings) {
-        const userSettings = new UserSettings({
-            user: document.id
-        });
-
-        await userSettings.save();
-
-        document.settings = userSettings.id;
-    }
-
 
     next();
 });
