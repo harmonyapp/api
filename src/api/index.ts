@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(cors());
 
 api.use("/v1", v1);
-app.use("/api", ratelimit({ windowMs: 5000, max: 8 }));
+app.use("/api", ratelimit({ windowMs: 16000, max: 96 }));
 app.use("/api", api);
 
 export default app;
