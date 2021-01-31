@@ -24,7 +24,7 @@ class MessagesController extends BaseController {
         if (req.query.before || req.query.after) {
             const queryMessageID = req.query.before ? req.query.before : req.query.after;
 
-            queryMessage = await Message.findOne({ id: queryMessageID });
+            queryMessage = await Message.findOne({ _id: queryMessageID });
 
             if (!queryMessage) {
                 return next(new GenericError("Message with specified ID not found"));
@@ -42,7 +42,7 @@ class MessagesController extends BaseController {
         }
 
         if (req.query.before) {
-            const beforeMessage = await Message.findOne({ id: req.query.before });
+            const beforeMessage = await Message.findOne({ _id: req.query.before });
 
             if (!beforeMessage) {
                 return next(new FieldError("before", "Message not found"));
@@ -54,7 +54,7 @@ class MessagesController extends BaseController {
                 messages
             });
         } else if (req.query.after) {
-            const afterMessage = await Message.findOne({ id: req.query.after });
+            const afterMessage = await Message.findOne({ _id: req.query.after });
 
             if (!afterMessage) {
                 return next(new FieldError("after", "Message not found"));
