@@ -14,7 +14,7 @@ class ApplicationsController extends BaseController {
     }
 
     public static async getApplicationByID(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
-        const application = await Application.find({ _id: req.params.id, user: req.user.id });
+        const application = await Application.findOne({ _id: req.params.id, user: req.user.id });
 
         if (!application) {
             return next(new GenericError("Application not found").setHttpStatusCode(HttpStatusCode.NOT_FOUND));
