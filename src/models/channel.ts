@@ -126,7 +126,7 @@ channelSchema.pre("validate", function (next) {
     if (typeof nsfw !== "boolean") {
         return next(new FieldError(
             "nsfw",
-            `Channel topic must be between ${channelValidation.topic.minlength} and ${channelValidation.topic.maxlength} in length`
+            `NSFW must be a boolean`
         ));
     }
 
