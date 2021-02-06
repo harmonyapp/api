@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
+import getPresentableObject from "./plugins/getPresentableObject";
 
 const staging = process.env.NODE_ENV === "test";
 
@@ -30,6 +31,8 @@ if (staging) {
         console.log("Connected to database");
     });
 }
+
+mongoose.plugin(getPresentableObject);
 
 // This will only have a value in staging.
 // It will hold the mongo instance, since we don't want to talk to external servers during staging

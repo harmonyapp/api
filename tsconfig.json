@@ -22,8 +22,7 @@
     },
     "include": [
         "src/**/*",
-        "typings/environment.d.ts",
-        "typings/express.d.ts",
+        "typings/**/*",
         "config/config.ts"
     ],
     "exclude": [

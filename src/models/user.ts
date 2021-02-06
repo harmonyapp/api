@@ -93,11 +93,6 @@ const userSchema = new Schema({
         type: Schema.Types.String,
         required: true,
         default: "0"
-    },
-    settings: {
-        type: Schema.Types.String,
-        unique: true,
-        ref: "UserSettings"
     }
 }, {
     timestamps: true
@@ -260,5 +255,10 @@ userSchema.pre("save", async function (next) {
 });
 
 const User: IUserModel = mongoose.model<IUserDocument, IUserModel>("User", userSchema);
+
+User.setPresentableFields({
+    username: true,
+    flags: true
+});
 
 export default User;

@@ -105,4 +105,12 @@ serverSchema.pre("remove", async function (next) {
 
 const Server: IServerModel = mongoose.model<IServerDocument, IServerModel>("Server", serverSchema);
 
+Server.setPresentableFields({
+    id: true,
+    name: true,
+    owner: {
+        populate: true
+    }
+})
+
 export default Server;

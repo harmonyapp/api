@@ -1,18 +1,20 @@
-import chalk from "chalk";
 import dotenv from "dotenv";
+
+dotenv.config();
+
+import "./mongoose/db";
+
+import chalk from "chalk";
 import cluster from "cluster";
 import { createServer } from "http";
 import { cpus } from "os";
-import app from "./api";
 import { initialize } from "./socket/instance";
 
-dotenv.config();
+import app from "./api";
 
 const server = createServer(app);
 
 initialize(server);
-
-import "./db/mongoose";
 
 const PORT = process.env.PORT;
 
