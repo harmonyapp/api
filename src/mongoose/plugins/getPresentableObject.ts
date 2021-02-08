@@ -45,6 +45,8 @@ const getPresentableObject = (schema: Schema) => {
     }
 
     schema.post(/find*|save/, async function (docs: Document[] | Document, next) {
+        if (!Array.isArray(docs) && !docs) return next();
+
         docs = Array.isArray(docs) ? docs : [docs];
 
         for (const doc of docs) {
