@@ -1,19 +1,12 @@
 import config from "../../config/config";
 import validator from "validator";
 import bcrypt from "bcryptjs";
-import mongoose, { Schema, Model, Document, DocumentToObjectOptions } from "mongoose";
+import mongoose, { Schema, Model, Document } from "mongoose";
 import snowflake from "../helpers/snowflake";
 import escapeRegex from "../helpers/escapeRegex";
 import Session, { ISessionDocument } from "./session";
 import FieldError from "../errors/FieldError";
 import { UsernameRegex } from "../util/Constants";
-
-interface toJSONOptions extends DocumentToObjectOptions {
-    /**
-     * Whether the returned object should contain only public properties
-     */
-    isPublic?: boolean;
-}
 
 export interface IUserModel extends Model<IUserDocument> {
     /**

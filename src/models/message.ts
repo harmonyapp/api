@@ -99,6 +99,6 @@ Message.setPresentableFields({
     server: {
         populate: true
     }
-})
+});
 
 export default Message;

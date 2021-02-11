@@ -111,7 +111,7 @@ channelSchema.pre("validate", function (next) {
     if (typeof nsfw !== "boolean") {
         return next(new FieldError(
             "nsfw",
-            `NSFW must be a boolean`
+            "NSFW must be a boolean"
         ));
     }
 

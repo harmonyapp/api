@@ -1,6 +1,6 @@
 import { Document, PresentableField } from "mongoose";
 
-const getPresentableFields = (document: Document, presentableFields: PresentableField<null>[]) => {
+const getPresentableFields = (document: Document, presentableFields: PresentableField<null>[]): Record<string, unknown> => {
     const newObject: Record<string, unknown> = {
         id: document.id
     };
@@ -13,12 +13,12 @@ const getPresentableFields = (document: Document, presentableFields: Presentable
     const hiddenProperties = ["_id", "__v"];
 
     for (const prop of hiddenProperties) {
-        if (newObject.hasOwnProperty(prop)) {
+        if (Object.keys(newObject).indexOf(prop) !== -1) {
             delete newObject[prop];
         }
     }
 
     return newObject;
-}
+};
 
 export default getPresentableFields;
