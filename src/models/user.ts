@@ -48,10 +48,6 @@ export interface IUserDocument extends Document {
      */
     flags: string;
     /**
-     * The ID of the settings document of this user
-     */
-    settings: string;
-    /**
      * The date this document was created at
      */
     createdAt: Date;
