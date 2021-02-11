@@ -65,19 +65,6 @@ const relationshipSchema = new Schema({
     timestamps: true
 });
 
-relationshipSchema.methods.toJSON = function () {
-    const relationship = this as IRelationshipDocument;
-
-    // Todo: add "user" property, containing the public properties of a user when async document presentation has been added.
-    // I'll add it soon, I just haven't come up with a good name for the function yet
-    const newObject = {
-        id: relationship.concerning,
-        type: relationship.type
-    };
-
-    return newObject;
-};
-
 relationshipSchema.pre("validate", async function (next) {
     const document = this as IRelationshipDocument;
 
@@ -91,5 +78,15 @@ relationshipSchema.pre("validate", async function (next) {
 });
 
 const Relationship: IRelationshipModel = mongoose.model<IRelationshipDocument, IRelationshipModel>("Relationship", relationshipSchema);
+
+Relationship.setPresentableFields({
+    user: {
+        populate: true
+    },
+    concerning: {
+        populate: true
+    },
+    type: true
+});
 
 export default Relationship;

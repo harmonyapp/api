@@ -1,16 +1,16 @@
 declare module "mongoose" {
-    export type PresentableField = Record<string, boolean | {
+    export type PresentableField<T> = { [P in keyof Omit<T, keyof Document>]?: boolean | {
         populate: boolean;
         yield?: string;
-    }>;
+    } };
 
     interface Document {
         getPresentableObject(): Promise<Record<string, unknown>>;
-        addPresentableFields(fields: PresentableField): void;
+        addPresentableFields(fields: PresentableField<null>): void;
         getPopulateableFields(): string[];
     }
 
     interface Model<T extends Document, QueryHelpers = {}> {
-        setPresentableFields(fields: PresentableField): void;
+        setPresentableFields(fields: PresentableField<T>): void;
     }
 }

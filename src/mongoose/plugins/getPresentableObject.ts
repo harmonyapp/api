@@ -2,9 +2,9 @@ import { Document, PresentableField, Schema } from "mongoose";
 import getPresentableFields from "../../helpers/getPresentableFields";
 
 const getPresentableObject = (schema: Schema) => {
-    const presentableFields: PresentableField[] = [];
+    const presentableFields: PresentableField<null>[] = [];
 
-    schema.statics.addPresentableFields = function (fields: PresentableField): void {
+    schema.statics.addPresentableFields = function (fields: PresentableField<null>): void {
         Object.assign(presentableFields, fields);
     }
 
@@ -38,7 +38,7 @@ const getPresentableObject = (schema: Schema) => {
         return schema.methods.getPresentableObject.call(this);
     }
 
-    schema.statics.setPresentableFields = function (fields: PresentableField): void {
+    schema.statics.setPresentableFields = function (fields: PresentableField<null>): void {
         const document = this as Document;
 
         return document.addPresentableFields(fields);

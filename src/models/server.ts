@@ -48,18 +48,6 @@ const serverSchema = new Schema({
     timestamps: true
 });
 
-serverSchema.methods.toJSON = function () {
-    const server = this as IServerDocument;
-
-    const newObject = {
-        id: server.id,
-        name: server.name,
-        owner_id: server.owner
-    };
-
-    return newObject;
-};
-
 serverSchema.pre("validate", function (next) {
     const document = this as IServerDocument;
 
@@ -106,11 +94,10 @@ serverSchema.pre("remove", async function (next) {
 const Server: IServerModel = mongoose.model<IServerDocument, IServerModel>("Server", serverSchema);
 
 Server.setPresentableFields({
-    id: true,
     name: true,
     owner: {
         populate: true
     }
-})
+});
 
 export default Server;

@@ -59,7 +59,6 @@ export interface IUserDocument extends Document {
      * Create a session for this user
      */
     createSession(): Promise<ISessionDocument>;
-    toJSON(options?: toJSONOptions): Record<string, unknown>;
 }
 
 const userSchema = new Schema({
@@ -132,33 +131,6 @@ userSchema.statics.findByCredentials = async function (username: string, passwor
     }
 
     return user;
-};
-
-userSchema.methods.toJSON = function ({ isPublic = true } = {}) {
-    const user = this as IUserDocument;
-
-    if (!isPublic) {
-        const newObject = {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            createdAt: user.createdAt
-        };
-
-        if (!newObject.email) {
-            delete newObject.email;
-        }
-
-        return newObject;
-    } else {
-        const newObject = {
-            id: user.id,
-            username: user.username,
-            createdAt: user.createdAt
-        };
-
-        return newObject;
-    }
 };
 
 // User validation

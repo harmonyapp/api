@@ -6,7 +6,7 @@ class UserController extends BaseController {
     public static async getUser(req: Request, res: Response): ControllerReturnPromise {
         const user = req.user;
 
-        res.send({ user: user.toJSON({ isPublic: true }) });
+        res.send({ user: user });
     }
 
     // public static async getUserByID(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {

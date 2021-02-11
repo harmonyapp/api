@@ -52,24 +52,14 @@ const roleSchema = new Schema({
     timestamps: true
 });
 
-roleSchema.methods.toJSON = function () {
-    const role = this as IRoleDocument;
-
-    return role.toObject();
-};
-
-// roleSchema.pre("validate", function (next) {
-//     const document = this as IRoleDocument;
-
-//     next();
-// });
-
-// roleSchema.pre("save", async function (next) {
-//     const document = this as IRoleDocument;
-
-//     next();
-// });
-
 const Role: IRoleModel = mongoose.model<IRoleDocument, IRoleModel>("Role", roleSchema);
+
+Role.setPresentableFields({
+    name: true,
+    permissions: true,
+    server: {
+        populate: true
+    }
+});
 
 export default Role;

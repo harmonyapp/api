@@ -74,21 +74,6 @@ const channelSchema = new Schema({
     timestamps: true
 });
 
-channelSchema.methods.toJSON = function () {
-    const channel = this as IChannelDocument;
-
-    const newObject = {
-        id: channel.id,
-        name: channel.name,
-        topic: channel.topic,
-        nsfw: channel.nsfw,
-        server: channel.server,
-        position: channel.position
-    };
-
-    return newObject;
-};
-
 channelSchema.pre("validate", function (next) {
     const document = this as IChannelDocument;
 
@@ -133,12 +118,16 @@ channelSchema.pre("validate", function (next) {
     next();
 });
 
-// channelSchema.pre("save", async function (next) {
-//     const document = this as IChannelDocument;
-
-//     next();
-// });
-
 const Channel: IChannelModel = mongoose.model<IChannelDocument, IChannelModel>("Channel", channelSchema);
+
+Channel.setPresentableFields({
+    name: true,
+    topic: true,
+    nsfw: true,
+    server: {
+        populate: true
+    },
+    position: true
+});
 
 export default Channel;

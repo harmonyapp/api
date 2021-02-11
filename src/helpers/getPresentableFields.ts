@@ -1,6 +1,6 @@
 import { Document, PresentableField } from "mongoose";
 
-const getPresentableFields = (document: Document, presentableFields: PresentableField[]) => {
+const getPresentableFields = (document: Document, presentableFields: PresentableField<null>[]) => {
     const newObject: Record<string, unknown> = {
         id: document.id
     };
