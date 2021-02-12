@@ -107,6 +107,42 @@ class MyRelationshipsController extends BaseController {
             return res.status(HttpStatusCode.NO_CONTENT).send();
         }
     }
+
+    public static async deleteRelationship(req: Request, res: Response): ControllerReturnPromise {
+        const user = req.params.userID ?
+            await User.findOne({ _id: req.params.userID }) :
+            await User.findByUsername(req.body.username);
+
+        if (!user) {
+            return res.status(HttpStatusCode.BAD_REQUEST).send();
+        }
+
+        const relationship = await Relationship.findOne({ user: req.user.id, concerning: user.id });
+        const concerning = await Relationship.findOne({ user: user.id, concerning: req.user.id });
+
+        if (!relationship) {
+            return res.status(HttpStatusCode.NOT_FOUND).send();
+        }
+
+        // If we have blocked the user, we will now be unblocking them
+        if (relationship.type === RelationshipTypes.BLOCK) {
+            await relationship.remove();
+        }
+
+        // If the relationship is an incoming/outgoing request, this will decline/cancel the request
+        else if (relationship.type === RelationshipTypes.INCOMING_FRIEND_REQUEST || relationship.type === RelationshipTypes.OUTGOING_FRIEND_REQUEST) {
+            await relationship.remove();
+            await concerning.remove();
+        }
+
+        // If the relationship is an established and mutual friendship, we will unfriend the users
+        else {
+            await relationship.remove();
+            await concerning.remove();
+        }
+
+        return res.status(HttpStatusCode.NO_CONTENT).send();
+    }
 }
 
 /**
