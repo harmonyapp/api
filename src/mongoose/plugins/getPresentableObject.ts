@@ -4,10 +4,6 @@ import getPresentableFields from "../../helpers/getPresentableFields";
 const getPresentableObject = (schema: Schema): void => {
     const presentableFields: PresentableField<null>[] = [];
 
-    schema.statics.addPresentableFields = function (fields: PresentableField<null>): void {
-        Object.assign(presentableFields, fields);
-    };
-
     schema.methods.getPopulateableFields = function () {
         const populateable = Object.keys(presentableFields).reduce((result, key) => {
             const value = presentableFields[key];
@@ -29,9 +25,7 @@ const getPresentableObject = (schema: Schema): void => {
     schema.methods.getPresentableObject = function (): Record<string, unknown> {
         const document = this as Document;
 
-        const returnValue = getPresentableFields(document, presentableFields);
-
-        return returnValue;
+        return getPresentableFields(document, presentableFields);
     };
 
     schema.methods.toJSON = function (): Record<string, unknown> {
@@ -39,9 +33,7 @@ const getPresentableObject = (schema: Schema): void => {
     };
 
     schema.statics.setPresentableFields = function (fields: PresentableField<null>): void {
-        const document = this as Document;
-
-        return document.addPresentableFields(fields);
+        Object.assign(presentableFields, fields);
     };
 
     schema.post(/find*|save/, async function (docs: Document[] | Document, next) {

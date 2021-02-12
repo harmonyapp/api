@@ -6,7 +6,6 @@ declare module "mongoose" {
 
     interface Document {
         getPresentableObject(): Promise<Record<string, unknown>>;
-        addPresentableFields(fields: PresentableField<null>): void;
         getPopulateableFields(): string[];
     }
 
