@@ -131,7 +131,7 @@ userSchema.pre("validate", async function (next) {
     const document = this as IUserDocument;
 
     const username = document.username;
-    const email = document.email;
+    const email = document.email?.toLowerCase();
     const password = document.password;
 
     const fieldErrors = new FieldError();
