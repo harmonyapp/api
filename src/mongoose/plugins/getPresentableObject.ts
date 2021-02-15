@@ -72,7 +72,7 @@ const getPresentableObject = (schema: Schema): void => {
             ...presentableFields,
             [field]: key
         };
-    }
+    };
 
     schema.methods.setPresentableFields = function (fields: PresentableField) {
         const document = this as Document;
@@ -82,7 +82,7 @@ const getPresentableObject = (schema: Schema): void => {
         });
 
         return this;
-    }
+    };
 
     schema.statics.setPresentableFields = function (fields: PresentableField): void {
         presentableFields = fields;
