@@ -219,6 +219,7 @@ const User: IUserModel = mongoose.model<IUserDocument, IUserModel>("User", userS
 
 User.setPresentableFields({
     username: true,
+    email: false,
     flags: true
 });
 
