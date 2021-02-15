@@ -74,33 +74,18 @@ const inviteSchema = new Schema({
     timestamps: true
 });
 
-inviteSchema.methods.toJSON = function () {
-    const invite = this as IInviteDocument;
-
-    const newObject = {
-        id: invite.id,
-        code: invite.code,
-        user: invite.user,
-        server: invite.server,
-        channel: invite.channel,
-        uses: invite.uses
-    };
-
-    return newObject;
-};
-
-// inviteSchema.pre("validate", function (next) {
-//     // const document = this as IInviteDocument;
-
-//     next();
-// });
-
-// inviteSchema.pre("save", async function (next) {
-//     const document = this as IInviteDocument;
-
-//     next();
-// });
-
 const Invite: IInviteModel = mongoose.model<IInviteDocument, IInviteModel>("Invite", inviteSchema);
+
+Invite.setPresentableFields({
+    code: true,
+    user: true,
+    server: {
+        populate: true
+    },
+    channel: {
+        populate: true
+    },
+    uses: true
+});
 
 export default Invite;

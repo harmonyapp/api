@@ -6,7 +6,7 @@ class UsersController extends BaseController {
     public static async getAuthenticatedUser(req: Request, res: Response): ControllerReturnPromise {
         const user = req.user;
 
-        res.send({ user: user.toJSON({ isPublic: false }) });
+        res.send({ user: user });
     }
 }
 

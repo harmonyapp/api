@@ -2,7 +2,7 @@ import isNumeric from "../helpers/isNumeric";
 import BitFieldResolvable from "../interfaces/BitFieldResolvable";
 
 class BitField {
-    public FLAGS: object = {};
+    public FLAGS: Record<string, number> = {};
 
     public readonly bits: number;
 

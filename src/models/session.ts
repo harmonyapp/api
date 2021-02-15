@@ -53,4 +53,10 @@ const sessionSchema = new Schema({
 
 const Session: ISessionModel = mongoose.model<ISessionDocument, ISessionModel>("Session", sessionSchema);
 
+Session.setPresentableFields({
+    user: {
+        populate: true
+    }
+});
+
 export default Session;

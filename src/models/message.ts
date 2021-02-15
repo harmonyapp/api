@@ -65,20 +65,6 @@ const messageSchema = new Schema({
     timestamps: true
 });
 
-messageSchema.methods.toJSON = function () {
-    const message = this as IMessageDocument;
-
-    const newObject = {
-        id: message.id,
-        content: message.content,
-        author: message.author,
-        channel: message.channel,
-        server: message.server
-    };
-
-    return newObject;
-};
-
 messageSchema.pre("validate", function (next) {
     const document = this as IMessageDocument;
 
@@ -100,12 +86,19 @@ messageSchema.pre("validate", function (next) {
     next();
 });
 
-// messageSchema.pre("save", async function (next) {
-//     const document = this as IMessageDocument;
-
-//     next();
-// });
-
 const Message: IMessageModel = mongoose.model<IMessageDocument, IMessageModel>("Message", messageSchema);
+
+Message.setPresentableFields({
+    content: true,
+    author: {
+        populate: true
+    },
+    channel: {
+        populate: true
+    },
+    server: {
+        populate: true
+    }
+});
 
 export default Message;

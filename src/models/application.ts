@@ -80,20 +80,6 @@ applicationSchema.methods.isWithinScope = function (scopes: Scope[]) {
     return scopes.every((scope) => document.scopes.indexOf(scope) !== -1);
 };
 
-applicationSchema.methods.toJSON = function () {
-    const application = this as IApplicationDocument;
-
-    const newObject = {
-        id: application.id,
-        name: application.name,
-        token: application.token,
-        user_id: application.user,
-        scopes: application.scopes
-    };
-
-    return newObject;
-};
-
 applicationSchema.pre("validate", function (next) {
     const document = this as IApplicationDocument;
     const scopes = document.scopes;
@@ -111,5 +97,14 @@ applicationSchema.pre("validate", function (next) {
 });
 
 const Application: IApplicationModel = mongoose.model<IApplicationDocument, IApplicationModel>("Application", applicationSchema);
+
+Application.setPresentableFields({
+    name: true,
+    token: true,
+    user: {
+        populate: true
+    },
+    scopes: true
+});
 
 export default Application;

@@ -1,19 +1,12 @@
 import config from "../../config/config";
 import validator from "validator";
 import bcrypt from "bcryptjs";
-import mongoose, { Schema, Model, Document, DocumentToObjectOptions } from "mongoose";
+import mongoose, { Schema, Model, Document } from "mongoose";
 import snowflake from "../helpers/snowflake";
 import escapeRegex from "../helpers/escapeRegex";
 import Session, { ISessionDocument } from "./session";
 import FieldError from "../errors/FieldError";
 import { UsernameRegex } from "../util/Constants";
-
-interface toJSONOptions extends DocumentToObjectOptions {
-    /**
-     * Whether the returned object should contain only public properties
-     */
-    isPublic?: boolean;
-}
 
 export interface IUserModel extends Model<IUserDocument> {
     /**
@@ -48,10 +41,6 @@ export interface IUserDocument extends Document {
      */
     flags: string;
     /**
-     * The ID of the settings document of this user
-     */
-    settings: string;
-    /**
      * The date this document was created at
      */
     createdAt: Date;
@@ -63,7 +52,6 @@ export interface IUserDocument extends Document {
      * Create a session for this user
      */
     createSession(): Promise<ISessionDocument>;
-    toJSON(options?: toJSONOptions): Record<string, unknown>;
 }
 
 const userSchema = new Schema({
@@ -93,11 +81,6 @@ const userSchema = new Schema({
         type: Schema.Types.String,
         required: true,
         default: "0"
-    },
-    settings: {
-        type: Schema.Types.String,
-        unique: true,
-        ref: "UserSettings"
     }
 }, {
     timestamps: true
@@ -141,33 +124,6 @@ userSchema.statics.findByCredentials = async function (username: string, passwor
     }
 
     return user;
-};
-
-userSchema.methods.toJSON = function ({ isPublic = true } = {}) {
-    const user = this as IUserDocument;
-
-    if (!isPublic) {
-        const newObject = {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            createdAt: user.createdAt
-        };
-
-        if (!newObject.email) {
-            delete newObject.email;
-        }
-
-        return newObject;
-    } else {
-        const newObject = {
-            id: user.id,
-            username: user.username,
-            createdAt: user.createdAt
-        };
-
-        return newObject;
-    }
 };
 
 // User validation
@@ -260,5 +216,11 @@ userSchema.pre("save", async function (next) {
 });
 
 const User: IUserModel = mongoose.model<IUserDocument, IUserModel>("User", userSchema);
+
+User.setPresentableFields({
+    username: true,
+    email: false,
+    flags: true
+});
 
 export default User;

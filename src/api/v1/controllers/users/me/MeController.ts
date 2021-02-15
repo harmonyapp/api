@@ -6,7 +6,9 @@ class MeController extends BaseController {
     public static async getUser(req: Request, res: Response): ControllerReturnPromise {
         const user = req.user;
 
-        res.send({ user: user.toJSON({ isPublic: false }) });
+        user.setPresentableField("email", true);
+
+        res.send({ user });
     }
 }
 

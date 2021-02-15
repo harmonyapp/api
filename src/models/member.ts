@@ -66,12 +66,6 @@ const memberSchema = new Schema({
     }
 });
 
-memberSchema.methods.toJSON = function () {
-    const member = this as IMemberDocument;
-
-    return member.toObject();
-};
-
 memberSchema.pre("validate", async function (next) {
     const document = this as IMemberDocument;
 
@@ -93,12 +87,17 @@ memberSchema.pre("validate", async function (next) {
     next();
 });
 
-// memberSchema.pre("save", async function (next) {
-//     const document = this as IMemberDocument;
-
-//     next();
-// });
-
 const Member: IMemberModel = mongoose.model<IMemberDocument, IMemberModel>("Member", memberSchema);
+
+Member.setPresentableFields({
+    server: {
+        populate: true
+    },
+    user: {
+        populate: true
+    },
+    roles: true,
+    nickname: true
+});
 
 export default Member;
