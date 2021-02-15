@@ -94,6 +94,8 @@ const getPresentableObject = (schema: Schema): void => {
         docs = Array.isArray(docs) ? docs : [docs];
 
         for (const doc of docs) {
+            if (!(doc instanceof Document)) continue;
+
             for (const field of doc.getPopulateableFields()) {
                 doc.populate(field);
             }
