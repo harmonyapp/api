@@ -19,4 +19,9 @@ router.put("/:userID",
     MyRelationshipsController.createRelationship
 );
 
+router.delete("/:userID",
+    authenticate({ required: true, allowApplications: false }),
+    MyRelationshipsController.deleteRelationship
+);
+
 export default router;
