@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import GenericError from "../../../errors/GenericError";
-import HttpStatusCode from "../../../interfaces/HttpStatusCode";
-import Invite from "../../../models/invite";
+import GenericError from "../../../../errors/GenericError";
+import HttpStatusCode from "../../../../interfaces/HttpStatusCode";
+import Invite from "../../../../models/invite";
 
 const findInvite = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const inviteCode = req.params.inviteCode;

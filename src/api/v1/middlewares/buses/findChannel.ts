@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import GenericError from "../../../errors/GenericError";
-import HttpStatusCode from "../../../interfaces/HttpStatusCode";
-import Channel from "../../../models/channel";
+import GenericError from "../../../../errors/GenericError";
+import HttpStatusCode from "../../../../interfaces/HttpStatusCode";
+import Channel from "../../../../models/channel";
 
 const findChannel = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const channelID = req.params.channelID;

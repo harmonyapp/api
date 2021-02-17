@@ -1,5 +1,5 @@
 import { Router } from "express";
-import findChannel from "../../middlewares/findChannel";
+import findChannel from "../../middlewares/buses/findChannel";
 import channel from "./channel";
 
 const router = Router();

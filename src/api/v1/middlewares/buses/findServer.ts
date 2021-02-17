@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import GenericError from "../../../errors/GenericError";
-import HttpStatusCode from "../../../interfaces/HttpStatusCode";
-import Member from "../../../models/member";
-import Server from "../../../models/server";
+import GenericError from "../../../../errors/GenericError";
+import HttpStatusCode from "../../../../interfaces/HttpStatusCode";
+import Member from "../../../../models/member";
+import Server from "../../../../models/server";
 
 const findServer = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const serverID = req.params.serverID;

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import GenericError from "../../../errors/GenericError";
-import HttpStatusCode from "../../../interfaces/HttpStatusCode";
-import User from "../../../models/user";
+import GenericError from "../../../../errors/GenericError";
+import HttpStatusCode from "../../../../interfaces/HttpStatusCode";
+import User from "../../../../models/user";
 
 const findUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const userID = req.params.userID;

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import authenticate from "../../middlewares/authenticate";
-import findInvite from "../../middlewares/findInvite";
+import findInvite from "../../middlewares/buses/findInvite";
 import invite from "./invite";
 
 const router = Router();

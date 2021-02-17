@@ -1,6 +1,6 @@
 import { Router } from "express";
 import authenticate from "../../middlewares/authenticate";
-import findUser from "../../middlewares/findUser";
+import findUser from "../../middlewares/buses/findUser";
 import me from "./me";
 import user from "./user";
 
