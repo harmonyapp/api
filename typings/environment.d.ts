@@ -47,14 +47,9 @@ declare global {
             DEBUG?: string;
 
             /**
-             * The host of the redis server
+             * The connection string for the Redis server
              */
-            REDIS_HOST: string;
-
-            /**
-             * The port of the redis server
-             */
-            REDIS_PORT: string;
+            REDIS_URI: string;
         }
     }
 }

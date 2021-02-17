@@ -9,7 +9,7 @@ let IO_INSTANCE: SocketServer | undefined = undefined;
 export function initialize(server: HttpServer): void {
     IO_INSTANCE = new SocketServer(server);
 
-    const pubClient = new RedisClient({ host: process.env.REDIS_HOST, port: +process.env.REDIS_PORT });
+    const pubClient = new RedisClient({ url: process.env.REDIS_URI, prefix: "socketio" });
     const subClient = pubClient.duplicate();
 
     IO_INSTANCE.adapter(createAdapter({ pubClient, subClient }));
