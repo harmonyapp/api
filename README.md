@@ -29,8 +29,7 @@ MONGODB_URI=mongodb://<ip>:<port>/<db>
 NODE_ENV=development|production
 THREAD_COUNT=1
 SERVER_ID=1
-REDIS_HOST=<ip>
-REDIS_PORT=<port>
+REDIS_URI=redis://<ip>:<port>/
 ```
 
 ### Configuring the app
