@@ -180,11 +180,6 @@ userSchema.pre("validate", async function (next) {
             return next(new FieldError("email", "Email is already in use"));
         }
 
-        // 89 is the longest that a valid email can be
-        if (email.length > 89) {
-            fieldErrors.addError("email", "Email can't be longer than 89 in length");
-        }
-
         if (!validator.isEmail(email)) {
             fieldErrors.addError("email", "Invalid email");
         }
