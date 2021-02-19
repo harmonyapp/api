@@ -204,7 +204,7 @@ userSchema.pre("save", async function (next) {
     const document = this as IUserDocument;
 
     if (document.isModified("password")) {
-        document.password = await bcrypt.hash(document.password, 10);
+        document.password = await bcrypt.hash(document.password, 12);
     }
 
     next();
