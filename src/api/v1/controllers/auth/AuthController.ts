@@ -60,10 +60,7 @@ class AuthController extends BaseController {
 
         await session.remove();
 
-        return res.send({
-            success: true,
-            message: "You have been logged out"
-        });
+        return res.status(HttpStatusCode.NO_CONTENT).send();
     }
 }
 
