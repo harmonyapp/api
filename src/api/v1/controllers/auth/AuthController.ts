@@ -17,6 +17,8 @@ class AuthController extends BaseController {
 
             const session = await user.createSession();
 
+            user.setPresentableField("email", true);
+
             return res.status(201).send({
                 token: session.token,
                 user: user
@@ -35,6 +37,8 @@ class AuthController extends BaseController {
 
         const session = await user.createSession();
 
+        user.setPresentableField("email", true);
+
         return res.send({
             token: session.token,
             user
@@ -45,14 +49,11 @@ class AuthController extends BaseController {
         const user = req.user;
         const session = req.session;
 
-        if (req.query.signOutAll) {
-            const { ok, n } = await Session.deleteMany({ user: user.id });
+        if (Object.keys(req.query).indexOf("signOutAll") !== -1) {
+            const { ok } = await Session.deleteMany({ user: user.id });
 
             if (ok) {
-                return res.send({
-                    success: true,
-                    message: "Successfully cleared " + n + " sessions"
-                });
+                return res.status(HttpStatusCode.NO_CONTENT).send();
             } else {
                 return next(new GenericError("Something went wrong").setHttpStatusCode(HttpStatusCode.INTERNAL_SERVER_ERROR));
             }
