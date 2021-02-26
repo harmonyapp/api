@@ -9,7 +9,7 @@
     "mocha:int": "ts-mocha --require ./test/fixtures/hooks.ts --jobs 1 test/int/**/*.test.ts",
     "mocha": "npm run mocha:unit && npm run mocha:int",
     "test": "npm run lint && npm run mocha",
-    "lint": "eslint src test",
+    "lint": "eslint src test --max-warnings=0",
     "lint:fix": "eslint --fix src test"
   },
   "author": "chris9740",
