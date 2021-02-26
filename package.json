@@ -51,7 +51,6 @@
     "crypto-js": "^4.0.0",
     "eslint": "^7.15.0",
     "jest": "^26.6.3",
-    "migrate-mongoose": "^4.0.0",
     "mongodb-memory-server": "^6.9.2",
     "supertest": "^6.0.1",
     "ts-jest": "^26.4.4",
