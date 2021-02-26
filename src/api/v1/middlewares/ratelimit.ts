@@ -1,8 +1,8 @@
-import redis from "redis";
 import rateLimit from "express-rate-limit";
 import RedisStore from "rate-limit-redis";
 import HttpStatusCode from "../../../interfaces/HttpStatusCode";
 import GenericError from "../../../errors/GenericError";
+import { createRedisClient } from "../../../redis/instance";
 
 const ratelimit = (options: rateLimit.Options = {
     windowMs: 1 * 60 * 1000,
@@ -15,7 +15,7 @@ const ratelimit = (options: rateLimit.Options = {
         },
         store: new RedisStore({
             expiry: options.windowMs / 1000,
-            client: redis.createClient({
+            client: createRedisClient({
                 url: process.env.REDIS_URI
             })
         })

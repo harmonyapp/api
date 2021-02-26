@@ -17,6 +17,8 @@ class AuthController extends BaseController {
 
             const session = await user.createSession();
 
+            user.setPresentableField("email", true);
+
             return res.status(201).send({
                 token: session.token,
                 user: user
@@ -34,6 +36,8 @@ class AuthController extends BaseController {
         }
 
         const session = await user.createSession();
+
+        user.setPresentableField("email", true);
 
         return res.send({
             token: session.token,
