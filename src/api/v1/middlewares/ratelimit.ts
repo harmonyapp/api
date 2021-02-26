@@ -13,6 +13,9 @@ const ratelimit = (options: rateLimit.Options = {
         handler(req, res, next) {
             return next(new GenericError("Too many requests, please try again in a bit").setHttpStatusCode(HttpStatusCode.TOO_MANY_REQUESTS));
         },
+        skip() {
+            return process.env.NODE_ENV !== "production";
+        },
         store: new RedisStore({
             expiry: options.windowMs / 1000,
             client: createRedisClient({
