@@ -72,13 +72,15 @@ serverSchema.pre("validate", function (next) {
 serverSchema.pre("save", async function (next) {
     const document = this as IServerDocument;
 
-    const defaultChannel = new Channel({
-        name: "general",
-        server: document.id,
-        position: 0
-    });
+    if (document.isNew) {
+        const defaultChannel = new Channel({
+            name: "general",
+            server: document.id,
+            position: 0
+        });
 
-    await defaultChannel.save();
+        await defaultChannel.save();
+    }
 
     next();
 });
