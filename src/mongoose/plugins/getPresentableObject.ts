@@ -17,7 +17,7 @@ const getPresentableObject = (schema: Schema): void => {
         return populateable;
     };
 
-    schema.methods.getPresentableObject = function (options: Record<string, unknown> = {}): Record<string, unknown> {
+    schema.methods.getPresentableObject = function (): Record<string, unknown> {
         const document = this as Document;
 
         const newObject: Record<string, unknown> = {
@@ -37,14 +37,6 @@ const getPresentableObject = (schema: Schema): void => {
                 continue;
             }
 
-            if (typeof presentableFieldValue === "function") {
-                const value = presentableFieldValue(options);
-
-                if (value === false) {
-                    continue;
-                }
-            }
-
             newObject[field] = document[field];
         }
 
@@ -60,7 +52,6 @@ const getPresentableObject = (schema: Schema): void => {
         return newObject;
     };
 
-    // For some reason, Javascript appears to be providing the variable name as the first argument of toJSON when called implicitly
     schema.methods.toJSON = function (): Record<string, unknown> {
         return schema.methods.getPresentableObject.call(this);
     };
