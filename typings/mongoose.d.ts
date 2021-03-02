@@ -7,12 +7,12 @@ declare module "mongoose" {
     export type PresentableFieldValue = boolean | {
         populate: boolean;
         yield?: string;
-    } | ((...options: unknown[]) => boolean);
+    };
 
     export type PresentableField<T = null> = PartialRecord<PresentableFieldKey<T>, PresentableFieldValue>;
 
     interface Document {
-        getPresentableObject(options: any): Record<string, unknown>;
+        getPresentableObject(): Record<string, unknown>;
         getPopulateableFields(): string[];
         setPresentableField(key: PresentableFieldKey<this> | string, value: PresentableFieldValue): Document;
         setPresentableFields(fields: PresentableField<this>): Document;
