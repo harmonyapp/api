@@ -2,7 +2,9 @@ import chai from "chai";
 import request from "supertest";
 import app from "../../src/api";
 import HttpStatusCode from "../../src/interfaces/HttpStatusCode";
+import validators from "../validators";
 import Session, { ISessionDocument } from "../../src/models/session";
+import User, { IUserDocument } from "../../src/models/user";
 
 describe("Authentication", function () {
     const username = "Eric";
@@ -10,12 +12,7 @@ describe("Authentication", function () {
     const password = "letmein";
 
     let token: string;
-    let user: {
-        id: string;
-        username: string;
-        email: string;
-        flags: string;
-    };
+    let user: IUserDocument;
 
     describe("Registration", function () {
         it("doesn't authenticate without a valid token", async function () {
@@ -63,7 +60,7 @@ describe("Authentication", function () {
             chai.expect(response.body.user.flags).to.be.equal("0");
 
             token = response.body.token;
-            user = response.body.user;
+            user = await User.findOne({ _id: response.body.user.id });
         });
 
         it("successfully authenticates with newly created token", async function () {
@@ -125,21 +122,7 @@ describe("Authentication", function () {
                 .post("/api/v1/auth/login")
                 .send({ username, password });
 
-            chai.expect(response.status).to.be.equal(HttpStatusCode.OK);
-
-            chai.expect(response.body).to.haveOwnProperty("token");
-            chai.expect(response.body).to.haveOwnProperty("user");
-
-            chai.expect(response.body.user).to.haveOwnProperty("id");
-            chai.expect(response.body.user).to.haveOwnProperty("username");
-            chai.expect(response.body.user).to.haveOwnProperty("email");
-            chai.expect(response.body.user).to.haveOwnProperty("flags");
-
-            chai.expect(response.body.user.id).to.match(/^[0-9]{10,25}$/);
-
-            chai.expect(response.body.user.username).to.be.equal(username);
-            chai.expect(response.body.user.email).to.be.equal(email);
-            chai.expect(response.body.user.flags).to.be.equal("0");
+            validators.isValidAuthAttempt(response, user);
         });
     });
 
@@ -193,6 +176,42 @@ describe("Authentication", function () {
 
                 chai.expect(response2.status).to.be.equal(HttpStatusCode.UNAUTHORIZED);
             }
+        });
+    });
+
+    describe("Authentication validation", function () {
+        it("doesn't access restricted endpoint without authentication", async function () {
+            // A token is provided, but it has no valid prefix and the rest of the token is invalid
+            const response1 = await request(app)
+                .get("/api/v1/users/@me")
+                .set("Authorization", "completely invalid token");
+
+            // A token is provided, and it has a valid prefix, but the token is not valid
+            const response2 = await request(app)
+                .get("/api/v1/users/@me")
+                .set("Authorization", "Bearer valid-prefix-but-invalid-token");
+
+            // No token and no header is provided at all
+            const response3 = await request(app)
+                .get("/api/v1/users/@me");
+
+            const responses = [response1, response2, response3];
+
+            for (const response of responses) {
+                chai.expect(response.status).to.be.equal(HttpStatusCode.UNAUTHORIZED);
+            }
+        });
+
+        it("does access a restricted endpoint with valid authentication", async function () {
+            const session = new Session({ user: user.id });
+
+            await session.save();
+
+            const response = await request(app)
+                .get("/api/v1/users/@me")
+                .set("Authorization", "Bearer " + session.token);
+
+            validators.isOwnAccount(response, user);
         });
     });
 });
