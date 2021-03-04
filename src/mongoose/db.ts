@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import getPresentableObject from "./plugins/getPresentableObject";
 
+mongoose.plugin(getPresentableObject);
+
 const staging = process.env.NODE_ENV === "test";
 
 const connectionOptions = {
@@ -14,17 +16,7 @@ const connectionOptions = {
 
 let mongoMemoryServer: MongoMemoryServer;
 
-if (staging) {
-    mongoMemoryServer = new MongoMemoryServer();
-
-    mongoMemoryServer.getUri().then((mongoUri) => {
-        mongoose.connect(mongoUri, connectionOptions, (error) => {
-            if (error) throw error;
-
-            console.log("Connected to database");
-        });
-    });
-} else {
+if (!staging) {
     mongoose.connect(process.env.MONGODB_URI, connectionOptions, (error) => {
         if (error) throw error;
 
@@ -32,7 +24,13 @@ if (staging) {
     });
 }
 
-mongoose.plugin(getPresentableObject);
+export const createStagingConnection = async function (): Promise<void> {
+    mongoMemoryServer = new MongoMemoryServer();
+
+    const mongoUri = await mongoMemoryServer.getUri();
+
+    await mongoose.connect(mongoUri, connectionOptions);
+};
 
 // This will only have a value in staging.
 // It will hold the mongo instance, since we don't want to talk to external servers during staging
