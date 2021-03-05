@@ -12,6 +12,10 @@ declare module "mongoose" {
     export type PresentableField<T = null> = PartialRecord<PresentableFieldKey<T>, PresentableFieldValue>;
 
     interface Document {
+        "$raw": Record<string, unknown>;
+        "$populated": Record<string, unknown>;
+        "$presentables": PresentableField;
+
         /**
          * Returns the presentable object, populated and cleaned up, ready to be sent to the client
          */

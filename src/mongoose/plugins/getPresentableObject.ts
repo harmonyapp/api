@@ -19,9 +19,14 @@ const getPresentableObject = (schema: Schema): void => {
 
     schema.methods.getPresentableObject = function (): Record<string, unknown> {
         const document = this as Document;
+        const populatedData = document["$populated"];
+
+        const selectedDocument = populatedData || document;
+
+        const rawDocumentData = document["$raw"];
 
         const newObject: Record<string, unknown> = {
-            id: document.id
+            id: selectedDocument.id
         };
 
         const modifiedPresentableFields = { ...presentableFields };
@@ -37,7 +42,9 @@ const getPresentableObject = (schema: Schema): void => {
                 continue;
             }
 
-            newObject[field] = document[field];
+            const newValue = selectedDocument[field] || rawDocumentData[field];
+
+            newObject[field] = newValue;
         }
 
         // These properties are *always* hidden, regardless of configuration, since they are never of any use to the client
@@ -87,11 +94,23 @@ const getPresentableObject = (schema: Schema): void => {
         for (const doc of docs) {
             if (!(doc instanceof Document)) continue;
 
-            for (const field of doc.getPopulateableFields()) {
+            const presentableFields = doc.getPopulateableFields();
+
+            doc["$raw"] = doc.toObject();
+
+            const nonPopulated = presentableFields.filter((field) => !doc.populated(field));
+
+            for (const field of nonPopulated) {
                 doc.populate(field);
             }
 
             await doc.execPopulate();
+
+            doc["$populated"] = doc.toJSON();
+
+            for (const field of nonPopulated) {
+                doc.depopulate(field);
+            }
         }
 
         return next();
