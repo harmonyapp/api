@@ -19,11 +19,11 @@ const getPresentableObject = (schema: Schema): void => {
 
     schema.methods.getPresentableObject = function (): Record<string, unknown> {
         const document = this as Document;
-        const populatedDocument = document["$populated"] as Document;
+        const populatedData = document["$populated"];
 
-        const selectedDocument = populatedDocument || document;
+        const selectedDocument = populatedData || document;
 
-        const rawDocument = document["$raw"];
+        const rawDocumentData = document["$raw"];
 
         const newObject: Record<string, unknown> = {
             id: selectedDocument.id
@@ -42,7 +42,7 @@ const getPresentableObject = (schema: Schema): void => {
                 continue;
             }
 
-            const newValue = selectedDocument[field] || rawDocument[field];
+            const newValue = selectedDocument[field] || rawDocumentData[field];
 
             newObject[field] = newValue;
         }
