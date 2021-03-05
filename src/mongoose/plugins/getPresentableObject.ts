@@ -98,7 +98,9 @@ const getPresentableObject = (schema: Schema): void => {
 
             doc["$raw"] = doc.toObject();
 
-            for (const field of presentableFields) {
+            const nonPopulated = presentableFields.filter((field) => !doc.populated(field));
+
+            for (const field of nonPopulated) {
                 doc.populate(field);
             }
 
@@ -106,7 +108,7 @@ const getPresentableObject = (schema: Schema): void => {
 
             doc["$populated"] = doc.toJSON();
 
-            for (const field of presentableFields) {
+            for (const field of nonPopulated) {
                 doc.depopulate(field);
             }
         }
