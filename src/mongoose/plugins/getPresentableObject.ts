@@ -42,6 +42,14 @@ const getPresentableObject = (schema: Schema): void => {
                 continue;
             }
 
+            if (typeof presentableFieldValue === "function") {
+                const shouldPresent = (presentableFieldValue as Function).call(document);
+
+                if (!shouldPresent) {
+                    continue;
+                }
+            }
+
             const newValue = selectedDocument[field] || rawDocumentData[field];
 
             newObject[field] = newValue;

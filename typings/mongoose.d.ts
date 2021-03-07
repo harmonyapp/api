@@ -3,13 +3,13 @@ declare module "mongoose" {
         [P in K]?: T;
     }
 
-    export type PresentableFieldKey<T = any> = keyof { [P in keyof Omit<T, keyof Document>] };
-    export type PresentableFieldValue = boolean | {
+    export type PresentableFieldKey<T = any> = (keyof { [P in keyof Omit<T, keyof Document>] } | (string & {}));
+    export type PresentableFieldValue<T = Document> = boolean | {
         populate: boolean;
         yield?: string;
-    };
+    } | ((this: T) => boolean);
 
-    export type PresentableField<T = null> = PartialRecord<PresentableFieldKey<T>, PresentableFieldValue>;
+    export type PresentableField<T = null> = PartialRecord<PresentableFieldKey<T>, PresentableFieldValue<T>>;
 
     interface Document {
         "$raw": Record<string, unknown>;
@@ -28,7 +28,7 @@ declare module "mongoose" {
          * Configure a single presentable field.
          * <note>This applies only to the single document it's run on</note>
          */
-        setPresentableField(key: PresentableFieldKey<this> | string, value: PresentableFieldValue): Document;
+        setPresentableField(key: PresentableFieldKey<this> | string, value: PresentableFieldValue<this>): Document;
         /**
          * Configure the presentable fields for the document.
          * <note>This only overwrites the fields that were provided, the others remain intact.</note>
