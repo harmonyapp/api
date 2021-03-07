@@ -43,7 +43,7 @@ const getPresentableObject = (schema: Schema): void => {
             }
 
             if (typeof presentableFieldValue === "function") {
-                const shouldPresent = (presentableFieldValue as Function).call(document);
+                const shouldPresent = (presentableFieldValue as () => boolean).call(document);
 
                 if (!shouldPresent) {
                     continue;
