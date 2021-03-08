@@ -6,8 +6,7 @@ declare module "mongoose" {
     export type PresentableFieldKey<T = any> = (keyof { [P in keyof Omit<T, keyof Document>] } | (string & {}));
     export type PresentableFieldValue<T = Document> = boolean | {
         populate: boolean;
-        yield?: string;
-    } | ((this: T) => boolean);
+    } | ((this: T) => boolean | { populate: boolean });
 
     export type PresentableField<T = null> = PartialRecord<PresentableFieldKey<T>, PresentableFieldValue<T>>;
 
@@ -35,6 +34,10 @@ declare module "mongoose" {
          * <note>This applies only to the single document it's run on</note>
          */
         setPresentableFields(fields: PresentableField<this>): Document;
+        /**
+         * Get all fields that should be included
+         */
+        getIncludibleFields(): string[];
     }
 
     interface Model<T extends Document, QueryHelpers = {}> {
