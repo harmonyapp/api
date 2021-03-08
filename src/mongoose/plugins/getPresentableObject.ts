@@ -4,11 +4,21 @@ const getPresentableObject = (schema: Schema): void => {
     let presentableFields: PresentableField = {};
 
     schema.methods.getPopulateableFields = function () {
+        const document = this as Document;
+
         const populateable = Object.keys(presentableFields).reduce((result, key) => {
             const value = presentableFields[key];
 
             if (typeof value === "object" && value.populate === true) {
                 result.push(key);
+            }
+
+            if (typeof value === "function") {
+                const returnValue = (value as () => boolean).call(document);
+
+                if (typeof returnValue === "object" && returnValue.populate === true) {
+                    result.push(key);
+                }
             }
 
             return result;
@@ -17,19 +27,12 @@ const getPresentableObject = (schema: Schema): void => {
         return populateable;
     };
 
-    schema.methods.getPresentableObject = function (): Record<string, unknown> {
+    schema.methods.getIncludibleFields = function () {
         const document = this as Document;
-        const populatedData = document["$populated"];
-
-        const selectedDocument = populatedData || document;
-
-        const rawDocumentData = document["$raw"];
-
-        const newObject: Record<string, unknown> = {
-            id: selectedDocument.id
-        };
 
         const modifiedPresentableFields = { ...presentableFields };
+
+        const includibleFields = [];
 
         if (document["$presentables"]) {
             Object.assign(modifiedPresentableFields, document["$presentables"]);
@@ -50,6 +53,27 @@ const getPresentableObject = (schema: Schema): void => {
                 }
             }
 
+            includibleFields.push(field);
+        }
+
+        return includibleFields;
+    };
+
+    schema.methods.getPresentableObject = function (): Record<string, unknown> {
+        const document = this as Document;
+        const populatedData = document["$populated"];
+
+        const selectedDocument = populatedData || document;
+
+        const rawDocumentData = document["$raw"];
+
+        const newObject: Record<string, unknown> = {
+            id: selectedDocument.id
+        };
+
+        const includibleFields = document.getIncludibleFields();
+
+        for (const field of includibleFields) {
             const newValue = selectedDocument[field] || rawDocumentData[field];
 
             newObject[field] = newValue;
