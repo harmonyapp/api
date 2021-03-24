@@ -2,6 +2,7 @@ import { Router } from "express";
 import MeController from "../../../controllers/users/me/MeController";
 import authenticate from "../../../middlewares/authenticate";
 import relationships from "./relationships";
+import channels from "./channels";
 
 const router = Router();
 
@@ -12,6 +13,10 @@ router.get("/",
 
 router.use("/relationships",
     relationships
+);
+
+router.use("/channels",
+    channels
 );
 
 export default router;

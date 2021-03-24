@@ -47,17 +47,13 @@ const config = convict({
             doc: "Channel verification",
             name: {
                 doc: "Name",
-                regex: {
-                    format: "RegExp",
-                    default: /^[a-z0-9\-]+$/
-                },
                 minlength: {
                     format: "nat",
                     default: 1
                 },
                 maxlength: {
                     format: "nat",
-                    default: 16
+                    default: 24
                 }
             },
             topic: {

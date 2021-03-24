@@ -24,9 +24,10 @@ export interface IMessageDocument extends Document {
      */
     channel: string;
     /**
-     * The server that this message belongs to
+     * The server that this message belongs to.
+     * <note>Only available on messages sent in a server</note>
      */
-    server: string;
+    server?: string;
     /**
      * The date this document was created at
      */
@@ -44,7 +45,8 @@ const messageSchema = new Schema({
     },
     content: {
         type: Schema.Types.String,
-        required: true
+        required: true,
+        trim: true
     },
     author: {
         type: Schema.Types.String,
@@ -58,7 +60,6 @@ const messageSchema = new Schema({
     },
     server: {
         type: Schema.Types.String,
-        required: true,
         ref: "Server"
     }
 }, {
@@ -68,7 +69,7 @@ const messageSchema = new Schema({
 messageSchema.pre("validate", function (next) {
     const document = this as IMessageDocument;
 
-    const content = document.content;
+    const content = document.content?.trim();
 
     if (!content) {
         return next(new FieldError("content", ErrorMessages.REQUIRED_FIELD));
@@ -98,7 +99,9 @@ Message.setPresentableFields({
     },
     server: {
         populate: true
-    }
+    },
+    createdAt: true,
+    updatedAt: true
 });
 
 export default Message;

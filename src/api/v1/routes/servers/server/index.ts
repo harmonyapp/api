@@ -1,4 +1,5 @@
 import { Router } from "express";
+import channelPolicies from "../../../../../policies/channelPolicies";
 import serverPolicies from "../../../../../policies/serverPolicies";
 import ServerController from "../../../controllers/servers/server/ServerController";
 import authenticate from "../../../middlewares/authenticate";
@@ -17,6 +18,7 @@ router.get("/channels",
 
 router.post("/channels",
     authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
+    channelPolicies.createChannel,
     ServerController.createChannel
 );
 

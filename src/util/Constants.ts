@@ -41,3 +41,11 @@ export const RelationshipTypes = {
     INCOMING_FRIEND_REQUEST: 3 as const,
     OUTGOING_FRIEND_REQUEST: 4 as const
 };
+
+export const ChannelTypes = {
+    SERVER_TEXT: 1 as const,
+    SERVER_VOICE: 2 as const,
+    SERVER_CATEGORY: 3 as const,
+    DM: 4 as const,
+    GROUP_DM: 5 as const
+};
