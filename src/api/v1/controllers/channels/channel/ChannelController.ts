@@ -5,6 +5,7 @@ import { ControllerReturnPromise } from "../../../../../interfaces/ControllerRet
 import Invite from "../../../../../models/invite";
 import HttpStatusCode from "../../../../../interfaces/HttpStatusCode";
 import Server from "../../../../../models/server";
+import { ChannelTypes } from "../../../../../util/Constants";
 
 class ChannelController extends BaseController {
     public static async getChannel(req: Request, res: Response): ControllerReturnPromise {
@@ -36,7 +37,11 @@ class ChannelController extends BaseController {
         try {
             await channel.remove();
 
-            await server.mendChannelPositions({ type: channel.type as 1 | 2 | 3, parent_id: channel.parent, save: true });
+            await server.mendChannelPositions({
+                channel_type: channel.type === ChannelTypes.SERVER_CATEGORY ? "category" : "channel",
+                parent_id: channel.parent,
+                save: true
+            });
         } catch (error) {
             return next(error);
         }

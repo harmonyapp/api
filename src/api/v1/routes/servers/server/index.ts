@@ -1,25 +1,14 @@
 import { Router } from "express";
-import channelPolicies from "../../../../../policies/channelPolicies";
 import serverPolicies from "../../../../../policies/serverPolicies";
 import ServerController from "../../../controllers/servers/server/ServerController";
 import authenticate from "../../../middlewares/authenticate";
+import channels from "./channels";
 
 const router = Router();
 
 router.get("/",
     authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
     ServerController.getServer
-);
-
-router.get("/channels",
-    authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
-    ServerController.getChannels
-);
-
-router.post("/channels",
-    authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
-    channelPolicies.createChannel,
-    ServerController.createChannel
 );
 
 router.patch("/",
@@ -32,5 +21,7 @@ router.delete("/",
     authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
     ServerController.deleteServer
 );
+
+router.use("/channels", channels);
 
 export default router;

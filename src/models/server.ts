@@ -30,7 +30,7 @@ export interface IServerDocument extends Document {
      */
     updatedAt: Date;
     /**
-     * Flatten the positions of the channels
+     * Flatten the positions of text and voice channels
      * 
      * @example
      * // This ...
@@ -38,8 +38,8 @@ export interface IServerDocument extends Document {
      * // ... becomes this
      * [{ position: 0 }, { position: 1 }, { position: 2 }]
      */
-    mendChannelPositions({ type, parent_id, save }: {
-        type?: typeof ChannelTypes.SERVER_TEXT | typeof ChannelTypes.SERVER_VOICE | typeof ChannelTypes.SERVER_CATEGORY,
+    mendChannelPositions({ channel_type, parent_id, save }: {
+        channel_type: "category" | "channel",
         parent_id?: string,
         save?: boolean
     }): Promise<[IChannelDocument[], boolean]>;
@@ -63,10 +63,10 @@ const serverSchema = new Schema({
     timestamps: true
 });
 
-serverSchema.methods.mendChannelPositions = async function ({ type, parent_id, save = true }) {
+serverSchema.methods.mendChannelPositions = async function ({ channel_type, parent_id = null, save = true }: { channel_type: "category" | "channel", parent_id?: string, save?: boolean }) {
     const document = this as IServerDocument;
 
-    const siblingExcludeQuery = type === ChannelTypes.SERVER_CATEGORY ? {
+    const siblingExcludeQuery = channel_type === "category" ? {
         $nin: [ChannelTypes.SERVER_TEXT, ChannelTypes.SERVER_VOICE]
     } : { $ne: ChannelTypes.SERVER_CATEGORY };
 

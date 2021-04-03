@@ -85,6 +85,14 @@ export interface IChannelDocument extends Document {
      * Asserts whether the field is applicable for the passed type
      */
     isFieldApplicable(field: keyof Omit<IChannelDocument, keyof Omit<keyof Document, "id">>, type: 1 | 2 | 3 | 4 | 5): boolean;
+    /**
+     * Asserts whether the channel can be swapped with another channel of the provided type
+     */
+    isSwappableWith(type: typeof ChannelTypes[keyof typeof ChannelTypes]): boolean;
+    /**
+     * Gets the channel siblings
+     */
+    getSiblings(): Promise<IChannelDocument[]>;
 }
 
 const channelSchema = new Schema({
@@ -166,6 +174,37 @@ const CHANNEL_FIELDS = {
 
 channelSchema.methods.isFieldApplicable = function (field: keyof Omit<IChannelDocument, keyof Document>, type: 1 | 2 | 3 | 4 | 5) {
     return CHANNEL_FIELDS[field].indexOf(type) !== -1;
+};
+
+channelSchema.methods.getSiblings = async function () {
+    const document = this as IChannelDocument;
+
+    const siblingExcludeQuery = document.type === ChannelTypes.SERVER_CATEGORY ? {
+        $nin: [ChannelTypes.SERVER_TEXT, ChannelTypes.SERVER_VOICE]
+    } : { $ne: ChannelTypes.SERVER_CATEGORY };
+
+    const siblings = await Channel.find({ type: siblingExcludeQuery, server: document.server });
+
+    return siblings;
+};
+
+channelSchema.methods.isSwappableWith = function (type: typeof ChannelTypes[keyof typeof ChannelTypes]) {
+    const document = this as IChannelDocument;
+
+    if (document.type === ChannelTypes.SERVER_TEXT || document.type === ChannelTypes.SERVER_VOICE) {
+        return (
+            [
+                ChannelTypes.SERVER_TEXT,
+                ChannelTypes.SERVER_VOICE
+            ] as typeof ChannelTypes[keyof typeof ChannelTypes][]
+        ).indexOf(type) !== -1;
+    }
+
+    if (document.type === ChannelTypes.SERVER_CATEGORY) {
+        return type === ChannelTypes.SERVER_CATEGORY;
+    }
+
+    return false;
 };
 
 channelSchema.pre("validate", async function (next) {
