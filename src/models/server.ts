@@ -153,6 +153,7 @@ serverSchema.pre("remove", async function (next) {
     const document = this as IServerDocument;
 
     await Member.deleteMany({ server: document.id });
+    await Channel.deleteMany({ server: document.id });
 
     next();
 });
