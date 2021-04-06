@@ -136,13 +136,22 @@ serverSchema.pre("save", async function (next) {
     const document = this as IServerDocument;
 
     if (document.isNew) {
+        const defaultCategory = new Channel({
+            name: "General",
+            server: document.id,
+            type: ChannelTypes.SERVER_CATEGORY,
+            position: 0
+        });
+
         const defaultChannel = new Channel({
             name: "general",
             server: document.id,
             type: ChannelTypes.SERVER_TEXT,
-            position: 0
+            position: 0,
+            parent: defaultCategory.id
         });
 
+        await defaultCategory.save();
         await defaultChannel.save();
     }
 
