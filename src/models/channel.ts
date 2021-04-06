@@ -304,6 +304,16 @@ channelSchema.pre("validate", async function (next) {
     next();
 });
 
+channelSchema.pre("remove", async function (next) {
+    const channel = this as IChannelDocument;
+
+    if (channel.type === ChannelTypes.SERVER_CATEGORY) {
+        await Channel.updateMany({ parent: channel.id }, { $set: { parent: null } });
+    }
+
+    return next();
+});
+
 const Channel: IChannelModel = mongoose.model<IChannelDocument, IChannelModel>("Channel", channelSchema);
 
 Channel.setPresentableFields({
