@@ -39,7 +39,6 @@ class ChannelController extends BaseController {
 
             await server.mendChannelPositions({
                 channel_type: channel.type === ChannelTypes.SERVER_CATEGORY ? "category" : "channel",
-                parent_id: channel.parent,
                 save: true
             });
         } catch (error) {

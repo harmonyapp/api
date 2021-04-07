@@ -5,6 +5,7 @@ import snowflake from "../helpers/snowflake";
 import Member from "./member";
 import { ChannelTypes } from "../util/Constants";
 import Channel, { IChannelDocument } from "./channel";
+import flattenChannels from "../helpers/flattenChannels";
 
 export type IServerModel = Model<IServerDocument>;
 
@@ -38,11 +39,10 @@ export interface IServerDocument extends Document {
      * // ... becomes this
      * [{ position: 0 }, { position: 1 }, { position: 2 }]
      */
-    mendChannelPositions({ channel_type, parent_id, save }: {
+    mendChannelPositions({ channel_type, save }: {
         channel_type: "category" | "channel",
-        parent_id?: string,
         save?: boolean
-    }): Promise<[IChannelDocument[], boolean]>;
+    }): Promise<[IChannelDocument[]]>;
 }
 
 const serverSchema = new Schema({
@@ -63,36 +63,42 @@ const serverSchema = new Schema({
     timestamps: true
 });
 
-serverSchema.methods.mendChannelPositions = async function ({ channel_type, parent_id = null, save = true }: { channel_type: "category" | "channel", parent_id?: string, save?: boolean }) {
+serverSchema.methods.mendChannelPositions = async function ({
+    channel_type,
+    save = true
+}: {
+    channel_type: "category" | "channel",
+    save?: boolean
+}) {
     const document = this as IServerDocument;
 
-    const siblingExcludeQuery = channel_type === "category" ? {
-        $nin: [ChannelTypes.SERVER_TEXT, ChannelTypes.SERVER_VOICE]
-    } : { $ne: ChannelTypes.SERVER_CATEGORY };
+    const serverChannels = await Channel.find({ server: document.id });
 
-    const channels = await Channel.find({ server: document.id, type: siblingExcludeQuery, parent: parent_id });
-
-    const valueToIncides = new Map();
-
-    const copy = [...channels];
-
-    const sorted = copy.sort((a, b) => a.position > b.position ? 1 : ((b.position > a.position) ? -1 : 0));
-
-    let shouldUpdate = false;
-
-    for (let i = 0; i < channels.length; i++) valueToIncides.set(sorted[i].id, i);
-
-    for (let i = 0; i < channels.length; i++) {
-        const index = valueToIncides.get(channels[i].id);
-
-        if (channels[i].position !== index) {
-            shouldUpdate = true;
-
-            channels[i].position = index;
+    const channels = serverChannels.filter((channel) => {
+        if (channel_type === "category") {
+            return channel.type === ChannelTypes.SERVER_CATEGORY;
         }
+
+        return channel.type !== ChannelTypes.SERVER_CATEGORY;
+    });
+
+    const categories = serverChannels.reduce<IChannelDocument[]>((accumulator, channel) => {
+        if (channel.type === ChannelTypes.SERVER_CATEGORY) {
+            accumulator.push(channel);
+        }
+
+        return accumulator;
+    }, []);
+
+    flattenChannels(categories);
+
+    for (const category of categories) {
+        const categoryChannels = channels.filter((channel) => channel.parent === category.id);
+
+        flattenChannels(categoryChannels);
     }
 
-    if (shouldUpdate && save) {
+    if (save) {
         await Channel.bulkWrite(channels.map((channel) => {
             return {
                 updateOne: {
@@ -105,10 +111,7 @@ serverSchema.methods.mendChannelPositions = async function ({ channel_type, pare
         }));
     }
 
-    // Renaming the variable is purely to clarify why we're sending it back
-    const didUpdate = shouldUpdate;
-
-    return [channels, didUpdate];
+    return channels;
 };
 
 serverSchema.pre("validate", function (next) {
