@@ -4,6 +4,8 @@ import BaseController from "../../BaseController";
 import { ControllerReturnPromise } from "../../../../../interfaces/ControllerReturn";
 import Invite from "../../../../../models/invite";
 import HttpStatusCode from "../../../../../interfaces/HttpStatusCode";
+import Server from "../../../../../models/server";
+import { ChannelTypes } from "../../../../../util/Constants";
 
 class ChannelController extends BaseController {
     public static async getChannel(req: Request, res: Response): ControllerReturnPromise {
@@ -30,13 +32,20 @@ class ChannelController extends BaseController {
     public static async deleteChannel(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
         const channel = req.bus.channel;
 
+        const server = await Server.findOne({ _id: channel.server });
+
         try {
             await channel.remove();
+
+            await server.mendChannelPositions({
+                channel_type: channel.type === ChannelTypes.SERVER_CATEGORY ? "category" : "channel",
+                save: true
+            });
         } catch (error) {
             return next(error);
         }
 
-        res.send({ channel });
+        return res.send({ channel });
     }
 
     public static async createInvite(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {

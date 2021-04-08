@@ -2,8 +2,10 @@ import mongoose, { Schema, Model, Document } from "mongoose";
 import config from "../../config/config";
 import FieldError from "../errors/FieldError";
 import snowflake from "../helpers/snowflake";
-import Channel from "./channel";
 import Member from "./member";
+import ChannelUtil from "../util/ChannelUtil";
+import Channel, { IChannelDocument } from "./channel";
+import { ChannelTypes } from "../util/Constants";
 
 export type IServerModel = Model<IServerDocument>;
 
@@ -28,6 +30,19 @@ export interface IServerDocument extends Document {
      * The date this document was updated at
      */
     updatedAt: Date;
+    /**
+     * Flatten the positions of text and voice channels
+     * 
+     * @example
+     * // This ...
+     * [{ position: 2 }, { position: 4 }, { position: 7 }]
+     * // ... becomes this
+     * [{ position: 0 }, { position: 1 }, { position: 2 }]
+     */
+    mendChannelPositions({ channel_type, save }: {
+        channel_type: "category" | "channel",
+        save?: boolean
+    }): Promise<[IChannelDocument[]]>;
 }
 
 const serverSchema = new Schema({
@@ -47,6 +62,60 @@ const serverSchema = new Schema({
 }, {
     timestamps: true
 });
+
+serverSchema.methods.mendChannelPositions = async function ({
+    channel_type,
+    save = true
+}: {
+    channel_type: "category" | "channel",
+    save?: boolean
+}) {
+    const document = this as IServerDocument;
+
+    const serverChannels = await Channel.find({ server: document.id });
+
+    const channels = serverChannels.filter((channel) => {
+        if (channel_type === "category") {
+            return channel.type === ChannelTypes.SERVER_CATEGORY;
+        }
+
+        return channel.type !== ChannelTypes.SERVER_CATEGORY;
+    });
+
+    const categories = serverChannels.reduce<IChannelDocument[]>((accumulator, channel) => {
+        if (channel.type === ChannelTypes.SERVER_CATEGORY) {
+            accumulator.push(channel);
+        }
+
+        return accumulator;
+    }, []);
+
+    const orphans = serverChannels.filter((channel) => !channel.parent && channel.type !== ChannelTypes.SERVER_CATEGORY);
+
+    ChannelUtil.flattenChannels(categories);
+    ChannelUtil.flattenChannels(orphans);
+
+    for (const category of categories) {
+        const categoryChannels = channels.filter((channel) => channel.parent === category.id);
+
+        ChannelUtil.flattenChannels(categoryChannels);
+    }
+
+    if (save) {
+        await Channel.bulkWrite(channels.map((channel) => {
+            return {
+                updateOne: {
+                    filter: {
+                        _id: channel.id
+                    },
+                    update: channel.toObject()
+                }
+            };
+        }));
+    }
+
+    return channels;
+};
 
 serverSchema.pre("validate", function (next) {
     const document = this as IServerDocument;
@@ -73,12 +142,22 @@ serverSchema.pre("save", async function (next) {
     const document = this as IServerDocument;
 
     if (document.isNew) {
-        const defaultChannel = new Channel({
-            name: "general",
+        const defaultCategory = new Channel({
+            name: "General",
             server: document.id,
+            type: ChannelTypes.SERVER_CATEGORY,
             position: 0
         });
 
+        const defaultChannel = new Channel({
+            name: "general",
+            server: document.id,
+            type: ChannelTypes.SERVER_TEXT,
+            position: 0,
+            parent: defaultCategory.id
+        });
+
+        await defaultCategory.save();
         await defaultChannel.save();
     }
 
@@ -89,6 +168,7 @@ serverSchema.pre("remove", async function (next) {
     const document = this as IServerDocument;
 
     await Member.deleteMany({ server: document.id });
+    await Channel.deleteMany({ server: document.id });
 
     next();
 });
