@@ -3,9 +3,9 @@ import config from "../../config/config";
 import FieldError from "../errors/FieldError";
 import snowflake from "../helpers/snowflake";
 import Member from "./member";
-import { ChannelTypes } from "../util/Constants";
+import ChannelUtil from "../util/ChannelUtil";
 import Channel, { IChannelDocument } from "./channel";
-import flattenChannels from "../helpers/flattenChannels";
+import { ChannelTypes } from "../util/Constants";
 
 export type IServerModel = Model<IServerDocument>;
 
@@ -90,12 +90,15 @@ serverSchema.methods.mendChannelPositions = async function ({
         return accumulator;
     }, []);
 
-    flattenChannels(categories);
+    const orphans = serverChannels.filter((channel) => !channel.parent && channel.type !== ChannelTypes.SERVER_CATEGORY);
+
+    ChannelUtil.flattenChannels(categories);
+    ChannelUtil.flattenChannels(orphans);
 
     for (const category of categories) {
         const categoryChannels = channels.filter((channel) => channel.parent === category.id);
 
-        flattenChannels(categoryChannels);
+        ChannelUtil.flattenChannels(categoryChannels);
     }
 
     if (save) {

@@ -6,6 +6,7 @@ import snowflake from "../helpers/snowflake";
 import HttpStatusCode from "../interfaces/HttpStatusCode";
 import User from "./user";
 import { ChannelTypes } from "../util/Constants";
+import ChannelUtil from "../util/ChannelUtil";
 
 export type IChannelModel = Model<IChannelDocument>;
 
@@ -305,10 +306,32 @@ channelSchema.pre("validate", async function (next) {
 });
 
 channelSchema.pre("remove", async function (next) {
-    const channel = this as IChannelDocument;
+    const document = this as IChannelDocument;
 
-    if (channel.type === ChannelTypes.SERVER_CATEGORY) {
-        await Channel.updateMany({ parent: channel.id }, { $set: { parent: null } });
+    if (document.type === ChannelTypes.SERVER_CATEGORY) {
+        const channels = await Channel.find({ server: document.server });
+
+        const orphans = ChannelUtil.sortByPosition(channels.filter((channel) => !channel.parent && channel.type !== ChannelTypes.SERVER_CATEGORY));
+        const affectedChannels = ChannelUtil.sortByPosition(channels.filter((channel) => channel.parent === document.id));
+
+        const updatedChannels = affectedChannels.map((channel) => {
+            channel.parent = null;
+
+            return channel;
+        });
+
+        ChannelUtil.flattenChannels(ChannelUtil.bumpChannels([...orphans, ...updatedChannels]));
+
+        await Channel.bulkWrite(updatedChannels.map((channel) => {
+            return {
+                updateOne: {
+                    filter: {
+                        _id: channel.id
+                    },
+                    update: channel.toObject()
+                }
+            };
+        }));
     }
 
     return next();
