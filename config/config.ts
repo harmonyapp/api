@@ -81,8 +81,7 @@ const config = convict({
                 }
             }
         }
-    },
-    defaultSettings: {}
+    }
 });
 
 const env = config.get("env");
