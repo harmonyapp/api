@@ -3,6 +3,8 @@ import BaseError from "./BaseError";
 class FieldError extends BaseError {
     public errors: { field: string, error: string }[] = [];
 
+    constructor();
+    constructor(field: string, error: string);
     constructor(field?: string, error?: string) {
         super();
 
