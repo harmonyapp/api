@@ -92,8 +92,9 @@ export interface IChannelDocument extends Document {
     isSwappableWith(type: typeof ChannelTypes[keyof typeof ChannelTypes]): boolean;
     /**
      * Gets the channel siblings
+     * @param raw Whether the resulting data should be raw or not
      */
-    getSiblings(): Promise<IChannelDocument[]>;
+    countSiblings(raw?: boolean): Promise<number>;
 }
 
 const channelSchema = new Schema({
@@ -177,16 +178,14 @@ channelSchema.methods.isFieldApplicable = function (field: keyof Omit<IChannelDo
     return CHANNEL_FIELDS[field].indexOf(type) !== -1;
 };
 
-channelSchema.methods.getSiblings = async function () {
+channelSchema.methods.countSiblings = async function () {
     const document = this as IChannelDocument;
 
     const siblingExcludeQuery = document.type === ChannelTypes.SERVER_CATEGORY ? {
         $nin: [ChannelTypes.SERVER_TEXT, ChannelTypes.SERVER_VOICE]
     } : { $ne: ChannelTypes.SERVER_CATEGORY };
 
-    const siblings = await Channel.find({ type: siblingExcludeQuery, server: document.server });
-
-    return siblings;
+    return await Channel.countDocuments({ type: siblingExcludeQuery, server: document.server });
 };
 
 channelSchema.methods.isSwappableWith = function (type: typeof ChannelTypes[keyof typeof ChannelTypes]) {
@@ -340,35 +339,25 @@ channelSchema.pre("remove", async function (next) {
 const Channel: IChannelModel = mongoose.model<IChannelDocument, IChannelModel>("Channel", channelSchema);
 
 Channel.setPresentableFields({
-    name() {
-        return this.isFieldApplicable("name", this.type);
+    name: true,
+    topic: true,
+    nsfw: true,
+    server: {
+        populate: true
     },
-    topic() {
-        return this.isFieldApplicable("topic", this.type);
-    },
-    nsfw() {
-        return this.isFieldApplicable("nsfw", this.type);
-    },
-    server() {
-        return this.isFieldApplicable("server", this.type) && { populate: true };
-    },
-    // Type should always be divulged, since it is always applicable.
-    // The client should be able to figure this out on it's own, but there is no reason not to provide it
     type: true,
-    position() {
-        return this.isFieldApplicable("position", this.type);
+    position: true,
+    parent: {
+        populate: true
     },
-    parent() {
-        return this.isFieldApplicable("parent", this.type) && { populate: true };
+    last_message: {
+        populate: true
     },
-    last_message() {
-        return this.isFieldApplicable("last_message", this.type) && { populate: true };
+    recipients: {
+        populate: true
     },
-    recipients() {
-        return this.isFieldApplicable("recipients", this.type) && { populate: true };
-    },
-    owner() {
-        return this.isFieldApplicable("owner", this.type) && { populate: true };
+    owner: {
+        populate: true
     }
 });
 

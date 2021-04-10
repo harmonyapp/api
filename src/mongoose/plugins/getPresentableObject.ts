@@ -1,24 +1,14 @@
-import { Document, PresentableField, PresentableFieldKey, PresentableFieldValue, Schema } from "mongoose";
+import { Document, PresentableField, PresentableFieldKey, PresentableFieldValue, Query, Schema } from "mongoose";
 
 const getPresentableObject = (schema: Schema): void => {
     let presentableFields: PresentableField = {};
 
-    schema.methods.getPopulateableFields = function () {
-        const document = this as Document;
-
+    const getPopulateableFields = function () {
         const populateable = Object.keys(presentableFields).reduce((result, key) => {
             const value = presentableFields[key];
 
             if (typeof value === "object" && value.populate === true) {
                 result.push(key);
-            }
-
-            if (typeof value === "function") {
-                const returnValue = (value as () => boolean).call(document);
-
-                if (typeof returnValue === "object" && returnValue.populate === true) {
-                    result.push(key);
-                }
             }
 
             return result;
@@ -61,20 +51,18 @@ const getPresentableObject = (schema: Schema): void => {
 
     schema.methods.getPresentableObject = function (): Record<string, unknown> {
         const document = this as Document;
-        const populatedData = document["$populated"];
 
-        const selectedDocument = populatedData || document;
-
-        const rawDocumentData = document["$raw"];
+        const documentData = document["$populated"] || document;
+        const rawDocumentData = document["$raw"] || document;
 
         const newObject: Record<string, unknown> = {
-            id: selectedDocument.id
+            id: document.id
         };
 
         const includibleFields = document.getIncludibleFields();
 
         for (const field of includibleFields) {
-            const newValue = selectedDocument[field] || rawDocumentData[field];
+            const newValue = documentData[field] || rawDocumentData[field];
 
             newObject[field] = newValue;
         }
@@ -126,27 +114,40 @@ const getPresentableObject = (schema: Schema): void => {
         for (const doc of docs) {
             if (!(doc instanceof Document)) continue;
 
-            const presentableFields = doc.getPopulateableFields();
+            const populateableFields = getPopulateableFields();
 
             doc["$raw"] = doc.toObject();
-
-            const nonPopulated = presentableFields.filter((field) => !doc.populated(field));
-
-            for (const field of nonPopulated) {
-                doc.populate(field);
-            }
-
-            await doc.execPopulate();
-
             doc["$populated"] = doc.toJSON();
 
-            for (const field of nonPopulated) {
+            for (const field of populateableFields) {
                 doc.depopulate(field);
             }
         }
 
         return next();
     });
+
+    schema.pre(/find|findOne/, function (next) {
+        const query = this as Query<unknown>;
+
+        const populateableFields = getPopulateableFields();
+
+        if (!query.getOptions()?.rawDocument) {
+            query.populate(populateableFields.join(" "));
+        }
+
+        next();
+    });
+
+    schema.query.raw = function () {
+        const query = this as Query<unknown>;
+
+        query.setOptions({
+            rawDocument: true
+        });
+
+        return query;
+    };
 };
 
 export default getPresentableObject;
