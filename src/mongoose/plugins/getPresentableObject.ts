@@ -139,6 +139,16 @@ const getPresentableObject = (schema: Schema): void => {
         next();
     });
 
+    schema.pre("save", async function (next) {
+        const populateableFields = getPopulateableFields();
+
+        this.populate(populateableFields.join(" "));
+
+        await this.execPopulate();
+
+        next();
+    });
+
     schema.query.raw = function () {
         const query = this as Query<unknown>;
 
