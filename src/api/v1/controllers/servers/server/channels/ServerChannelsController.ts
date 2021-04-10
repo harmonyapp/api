@@ -45,9 +45,7 @@ class ServerChannelsController extends BaseController {
             return next(error);
         }
 
-        const siblings = await channel.getSiblings();
-
-        channel.position = siblings.length;
+        channel.position = await channel.countSiblings();
 
         try {
             await channel.save();

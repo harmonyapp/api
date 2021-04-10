@@ -4,11 +4,11 @@ declare module "mongoose" {
     }
 
     export type PresentableFieldKey<T = any> = (keyof { [P in keyof Omit<T, keyof Document>] } | (string & {}));
-    export type PresentableFieldValue<T = Document> = boolean | {
+    export type PresentableFieldValue = boolean | {
         populate: boolean;
-    } | ((this: T) => boolean | { populate: boolean });
+    };
 
-    export type PresentableField<T = null> = PartialRecord<PresentableFieldKey<T>, PresentableFieldValue<T>>;
+    export type PresentableField<T = null> = PartialRecord<PresentableFieldKey<T>, PresentableFieldValue>;
 
     interface Document {
         "$raw": Record<string, unknown>;
@@ -20,14 +20,10 @@ declare module "mongoose" {
          */
         getPresentableObject(): Record<string, unknown>;
         /**
-         * Returns all fields that are subject to being populated, if any
-         */
-        getPopulateableFields(): string[];
-        /**
          * Configure a single presentable field.
          * <note>This applies only to the single document it's run on</note>
          */
-        setPresentableField(key: PresentableFieldKey<this> | string, value: PresentableFieldValue<this>): Document;
+        setPresentableField(key: PresentableFieldKey<this> | string, value: PresentableFieldValue): Document;
         /**
          * Configure the presentable fields for the document.
          * <note>This only overwrites the fields that were provided, the others remain intact.</note>
@@ -45,5 +41,9 @@ declare module "mongoose" {
          * Configure the presentable fields for this model
          */
         setPresentableFields(fields: PresentableField<T>): void;
+    }
+
+    interface DocumentQuery<T, DocType extends Document, QueryHelpers = {}> {
+        raw<T extends Document>(): DocumentQuery<DocType[], DocType, QueryHelpers> & QueryHelpers;
     }
 }

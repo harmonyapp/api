@@ -42,7 +42,7 @@ export interface IServerDocument extends Document {
     mendChannelPositions({ channel_type, save }: {
         channel_type: "category" | "channel",
         save?: boolean
-    }): Promise<[IChannelDocument[]]>;
+    }): Promise<IChannelDocument[]>;
 }
 
 const serverSchema = new Schema({
@@ -72,7 +72,7 @@ serverSchema.methods.mendChannelPositions = async function ({
 }) {
     const document = this as IServerDocument;
 
-    const serverChannels = await Channel.find({ server: document.id });
+    const serverChannels = await Channel.find({ server: document.id }).raw();
 
     const channels = serverChannels.filter((channel) => {
         if (channel_type === "category") {
