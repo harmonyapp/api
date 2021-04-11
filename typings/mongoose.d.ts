@@ -44,6 +44,6 @@ declare module "mongoose" {
     }
 
     interface DocumentQuery<T, DocType extends Document, QueryHelpers = {}> {
-        raw<T extends Document>(): DocumentQuery<DocType[], DocType, QueryHelpers> & QueryHelpers;
+        raw<T extends Document>(): this;
     }
 }
