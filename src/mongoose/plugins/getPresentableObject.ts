@@ -4,7 +4,7 @@ const getPresentableObject = (schema: Schema): void => {
     let presentableFields: PresentableField = {};
 
     const getPopulateableFields = function () {
-        const populateable = Object.keys(presentableFields).reduce((result, key) => {
+        const populateable = Object.keys(presentableFields).reduce<string[]>((result, key) => {
             const value = presentableFields[key];
 
             if (typeof value === "object" && value.populate === true) {
@@ -12,7 +12,7 @@ const getPresentableObject = (schema: Schema): void => {
             }
 
             return result;
-        }, [] as string[]);
+        }, []);
 
         return populateable;
     };

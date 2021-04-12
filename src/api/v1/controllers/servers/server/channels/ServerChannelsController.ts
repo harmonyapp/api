@@ -163,7 +163,7 @@ class ServerChannelsController extends BaseController {
             return serverChannel;
         });
 
-        const parentToChannels = serverChannels.reduce((accumulator, channel) => {
+        const parentToChannels = serverChannels.reduce<Record<string, IChannelDocument[]>>((accumulator, channel) => {
             const parent = channel.parent || (channel.type === 3 && "category") || "orphan";
 
             if (!accumulator[parent]) { accumulator[parent] = []; }
@@ -171,7 +171,7 @@ class ServerChannelsController extends BaseController {
             accumulator[parent].push(channel);
 
             return accumulator;
-        }, {} as Record<string, IChannelDocument[]>);
+        }, {});
 
         for (const parent of Object.keys(parentToChannels)) {
             const positionArray = parentToChannels[parent].map((channel) => channel.position);
