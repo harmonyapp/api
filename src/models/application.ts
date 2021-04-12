@@ -74,22 +74,19 @@ const applicationSchema = new Schema({
     timestamps: true
 });
 
-applicationSchema.methods.isWithinScope = function (scopes: Scope[]) {
-    const document = this as IApplicationDocument;
-
-    return scopes.every((scope) => document.scopes.indexOf(scope) !== -1);
+applicationSchema.methods.isWithinScope = function (this: IApplicationDocument, scopes: Scope[]) {
+    return scopes.every((scope) => this.scopes.indexOf(scope) !== -1);
 };
 
-applicationSchema.pre("validate", function (next) {
-    const document = this as IApplicationDocument;
-    const scopes = document.scopes;
+applicationSchema.pre<IApplicationDocument>("validate", function (next) {
+    const scopes = this.scopes;
     const invalidScopes = scopes.filter((scope) => Scopes.indexOf(scope) === -1);
 
     if (invalidScopes.length) {
         return next(new FieldError("scopes", `Invalid scopes "${invalidScopes.join(", ")}"`));
     }
 
-    if (!document.name || document.name.trim().length === 0) {
+    if (!this.name || this.name.trim().length === 0) {
         return next(new FieldError("name", ErrorMessages.REQUIRED_FIELD));
     }
 

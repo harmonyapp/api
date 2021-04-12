@@ -78,7 +78,9 @@ const Invite: IInviteModel = mongoose.model<IInviteDocument, IInviteModel>("Invi
 
 Invite.setPresentableFields({
     code: true,
-    user: true,
+    user: {
+        populate: true
+    },
     server: {
         populate: true
     },

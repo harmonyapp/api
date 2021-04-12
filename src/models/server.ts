@@ -63,16 +63,14 @@ const serverSchema = new Schema({
     timestamps: true
 });
 
-serverSchema.methods.mendChannelPositions = async function ({
+serverSchema.methods.mendChannelPositions = async function (this: IServerDocument, {
     channel_type,
     save = true
 }: {
     channel_type: "category" | "channel",
     save?: boolean
 }) {
-    const document = this as IServerDocument;
-
-    const serverChannels = await Channel.find({ server: document.id }).raw();
+    const serverChannels = await Channel.find({ server: this.id }).raw();
 
     const channels = serverChannels.filter((channel) => {
         if (channel_type === "category") {
@@ -117,10 +115,8 @@ serverSchema.methods.mendChannelPositions = async function ({
     return channels;
 };
 
-serverSchema.pre("validate", function (next) {
-    const document = this as IServerDocument;
-
-    const name = document.name;
+serverSchema.pre<IServerDocument>("validate", function (next) {
+    const name = this.name;
 
     if (!name) {
         return next(new FieldError("name", "Name is required"));
@@ -138,20 +134,18 @@ serverSchema.pre("validate", function (next) {
     next();
 });
 
-serverSchema.pre("save", async function (next) {
-    const document = this as IServerDocument;
-
-    if (document.isNew) {
+serverSchema.pre<IServerDocument>("save", async function (next) {
+    if (this.isNew) {
         const defaultCategory = new Channel({
             name: "General",
-            server: document.id,
+            server: this.id,
             type: ChannelTypes.SERVER_CATEGORY,
             position: 0
         });
 
         const defaultChannel = new Channel({
             name: "general",
-            server: document.id,
+            server: this.id,
             type: ChannelTypes.SERVER_TEXT,
             position: 0,
             parent: defaultCategory.id
@@ -164,11 +158,9 @@ serverSchema.pre("save", async function (next) {
     next();
 });
 
-serverSchema.pre("remove", async function (next) {
-    const document = this as IServerDocument;
-
-    await Member.deleteMany({ server: document.id });
-    await Channel.deleteMany({ server: document.id });
+serverSchema.pre<IServerDocument>("remove", async function (next) {
+    await Member.deleteMany({ server: this.id });
+    await Channel.deleteMany({ server: this.id });
 
     next();
 });

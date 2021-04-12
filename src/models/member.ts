@@ -66,10 +66,8 @@ const memberSchema = new Schema({
     }
 });
 
-memberSchema.pre("validate", async function (next) {
-    const document = this as IMemberDocument;
-
-    const nickname = document.nickname;
+memberSchema.pre<IMemberDocument>("validate", async function (next) {
+    const nickname = this.nickname;
 
     if (nickname && (nickname.length < 1 || nickname.length > 16)) {
         return next(new FieldError(
@@ -78,10 +76,10 @@ memberSchema.pre("validate", async function (next) {
         ));
     }
 
-    const user = await User.findOne({ _id: document.user });
+    const user = await User.findOne({ _id: this.user });
 
     if (nickname === user.username) {
-        delete document.nickname;
+        delete this.nickname;
     }
 
     next();

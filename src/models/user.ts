@@ -96,11 +96,9 @@ userSchema.statics.findByUsername = async function (username: string) {
     return user;
 };
 
-userSchema.methods.createSession = async function () {
-    const user = this as IUserDocument;
-
+userSchema.methods.createSession = async function (this: IUserDocument) {
     const sessionOptions = {
-        user: user.id
+        user: this.id
     };
 
     const session = new Session(sessionOptions);
@@ -127,12 +125,10 @@ userSchema.statics.findByCredentials = async function (username: string, passwor
 };
 
 // User validation
-userSchema.pre("validate", async function (next) {
-    const document = this as IUserDocument;
-
-    const username = document.username;
-    const email = document.email?.toLowerCase();
-    const password = document.password;
+userSchema.pre<IUserDocument>("validate", async function (next) {
+    const username = this.username;
+    const email = this.email?.toLowerCase();
+    const password = this.password;
 
     const fieldErrors = new FieldError();
 
@@ -152,7 +148,7 @@ userSchema.pre("validate", async function (next) {
         return next(fieldErrors);
     }
 
-    if (document.isModified("username")) {
+    if (this.isModified("username")) {
         const userExists = !!(await User.findByUsername(username));
 
         if (userExists) {
@@ -173,7 +169,7 @@ userSchema.pre("validate", async function (next) {
         }
     }
 
-    if (document.isModified("email")) {
+    if (this.isModified("email")) {
         const emailExists = await User.exists({ email });
 
         if (emailExists) {
@@ -187,7 +183,7 @@ userSchema.pre("validate", async function (next) {
 
     // The minimum password length required is 6 characters, because anything less is too insecure
     // The maximum password length is 72 characters, because that's the length bcrypt truncates at
-    if (document.isModified("password")) {
+    if (this.isModified("password")) {
         if (password.length < 6 || password.length > 72) {
             fieldErrors.addError("password", "Password must be between 6 and 72 in length");
         }
@@ -200,11 +196,9 @@ userSchema.pre("validate", async function (next) {
     next();
 });
 
-userSchema.pre("save", async function (next) {
-    const document = this as IUserDocument;
-
-    if (document.isModified("password")) {
-        document.password = await bcrypt.hash(document.password, 12);
+userSchema.pre<IUserDocument>("save", async function (next) {
+    if (this.isModified("password")) {
+        this.password = await bcrypt.hash(this.password, 12);
     }
 
     next();
