@@ -5,18 +5,14 @@ import GenericError from "../../../../../../errors/GenericError";
 import { ControllerReturnPromise } from "../../../../../../interfaces/ControllerReturn";
 import FieldError from "../../../../../../errors/FieldError";
 import Message, { IMessageDocument } from "../../../../../../models/message";
+import isNumeric from "../../../../../../helpers/isNumeric";
 
 class MessagesController extends BaseController {
     public static async getMessages(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
         const channel = req.bus.channel;
 
         if (req.query.before && req.query.after) {
-            const fieldErrors = new FieldError();
-
-            fieldErrors.addError("before", "This cannot be combined with \"after\"");
-            fieldErrors.addError("after", "This cannot be combined with \"before\"");
-
-            return next(fieldErrors);
+            return next(new GenericError("\"before\" and \"after\" have to be passed exclusively"));
         }
 
         let queryMessage: IMessageDocument;
@@ -24,14 +20,14 @@ class MessagesController extends BaseController {
         if (req.query.before || req.query.after) {
             const queryMessageID = req.query.before ? req.query.before : req.query.after;
 
-            queryMessage = await Message.findOne({ _id: queryMessageID });
+            queryMessage = await Message.findOne({ _id: queryMessageID }).raw();
 
             if (!queryMessage) {
                 return next(new GenericError("Message with specified ID not found"));
             }
         }
 
-        if (typeof req.query.limit !== "string" || Number.isNaN(Number(req.query.limit))) {
+        if (typeof req.query.limit !== "string" || !isNumeric(req.query.limit)) {
             return next(new FieldError("limit", "This field expects a number"));
         }
 
@@ -44,11 +40,7 @@ class MessagesController extends BaseController {
         if (req.query.before) {
             const beforeMessage = await Message.findOne({ _id: req.query.before });
 
-            if (!beforeMessage) {
-                return next(new FieldError("before", "Message not found"));
-            }
-
-            const messages = await Message.find({ channel: channel.id, createdAt: { $gte: beforeMessage.createdAt } }).sort("-createdAt").limit(limit);
+            const messages = await Message.find({ channel: channel.id, createdAt: { $lt: beforeMessage.createdAt } }).sort("-createdAt").limit(limit);
 
             return res.send({
                 messages
@@ -56,11 +48,7 @@ class MessagesController extends BaseController {
         } else if (req.query.after) {
             const afterMessage = await Message.findOne({ _id: req.query.after });
 
-            if (!afterMessage) {
-                return next(new FieldError("after", "Message not found"));
-            }
-
-            const messages = await Message.find({ channel: channel.id, createdAt: { $lte: afterMessage.createdAt } }).sort("-createdAt").limit(limit);
+            const messages = await Message.find({ channel: channel.id, createdAt: { $gt: afterMessage.createdAt } }).sort("-createdAt").limit(limit);
 
             return res.send({
                 messages
