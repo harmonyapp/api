@@ -15,6 +15,8 @@ const authenticate = ({ scopes = [], required = false, allowApplications = true 
             console.warn("Scopes will be ignored if `allowApplications` is set to false");
         }
 
+        if (req.user) return next();
+
         try {
             const header = req.headers.authorization?.trim();
 
