@@ -65,10 +65,8 @@ const relationshipSchema = new Schema({
     timestamps: true
 });
 
-relationshipSchema.pre("validate", async function (next) {
-    const document = this as IRelationshipDocument;
-
-    const concerning = await User.findOne({ _id: document.concerning });
+relationshipSchema.pre<IRelationshipDocument>("validate", async function (next) {
+    const concerning = await User.findOne({ _id: this.concerning });
 
     if (!concerning) {
         return next(new GenericError("User not found"));

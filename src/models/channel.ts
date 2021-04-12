@@ -178,20 +178,16 @@ channelSchema.methods.isFieldApplicable = function (field: keyof Omit<IChannelDo
     return CHANNEL_FIELDS[field].indexOf(type) !== -1;
 };
 
-channelSchema.methods.countSiblings = async function () {
-    const document = this as IChannelDocument;
-
-    const siblingExcludeQuery = document.type === ChannelTypes.SERVER_CATEGORY ? {
+channelSchema.methods.countSiblings = async function (this: IChannelDocument) {
+    const siblingExcludeQuery = this.type === ChannelTypes.SERVER_CATEGORY ? {
         $nin: [ChannelTypes.SERVER_TEXT, ChannelTypes.SERVER_VOICE]
     } : { $ne: ChannelTypes.SERVER_CATEGORY };
 
-    return await Channel.countDocuments({ type: siblingExcludeQuery, server: document.server });
+    return await Channel.countDocuments({ type: siblingExcludeQuery, server: this.server });
 };
 
-channelSchema.methods.isSwappableWith = function (type: typeof ChannelTypes[keyof typeof ChannelTypes]) {
-    const document = this as IChannelDocument;
-
-    if (document.type === ChannelTypes.SERVER_TEXT || document.type === ChannelTypes.SERVER_VOICE) {
+channelSchema.methods.isSwappableWith = function (this: IChannelDocument, type: typeof ChannelTypes[keyof typeof ChannelTypes]) {
+    if (this.type === ChannelTypes.SERVER_TEXT || this.type === ChannelTypes.SERVER_VOICE) {
         return (
             [
                 ChannelTypes.SERVER_TEXT,
@@ -200,17 +196,15 @@ channelSchema.methods.isSwappableWith = function (type: typeof ChannelTypes[keyo
         ).indexOf(type) !== -1;
     }
 
-    if (document.type === ChannelTypes.SERVER_CATEGORY) {
+    if (this.type === ChannelTypes.SERVER_CATEGORY) {
         return type === ChannelTypes.SERVER_CATEGORY;
     }
 
     return false;
 };
 
-channelSchema.pre("validate", async function (next) {
-    const document = this as IChannelDocument;
-
-    const { name, topic, nsfw, position, type, parent, recipients, server } = document;
+channelSchema.pre<IChannelDocument>("validate", async function (next) {
+    const { name, topic, nsfw, position, type, parent, recipients, server } = this;
 
     const channels = await Channel.find({ server: server });
 
@@ -224,7 +218,7 @@ channelSchema.pre("validate", async function (next) {
     const fieldErrors = new FieldError();
 
     for (const field of Object.keys(CHANNEL_FIELDS)) {
-        if (document[field] && !document.isFieldApplicable(field as keyof typeof CHANNEL_FIELDS, type)) {
+        if (this[field] && !this.isFieldApplicable(field as keyof typeof CHANNEL_FIELDS, type)) {
             fieldErrors.addError(field, "This field is not applicable for this channel type");
         }
     }
@@ -234,7 +228,7 @@ channelSchema.pre("validate", async function (next) {
     }
 
     for (const field of nonOmittableIfApplicable) {
-        if (!document[field] && document.isFieldApplicable(field as keyof typeof CHANNEL_FIELDS, type)) {
+        if (!this[field] && this.isFieldApplicable(field as keyof typeof CHANNEL_FIELDS, type)) {
             return next(new FieldError(field, "This field is required"));
         }
     }
@@ -250,8 +244,8 @@ channelSchema.pre("validate", async function (next) {
             ));
         }
 
-        if (document.type === ChannelTypes.SERVER_TEXT) {
-            document.name = document.name.replaceAll(" ", "-").toLowerCase();
+        if (this.type === ChannelTypes.SERVER_TEXT) {
+            this.name = this.name.replaceAll(" ", "-").toLowerCase();
         }
     }
 
@@ -282,7 +276,7 @@ channelSchema.pre("validate", async function (next) {
         }
     }
 
-    if (document.isFieldApplicable("server", document.type)) {
+    if (this.isFieldApplicable("server", this.type)) {
         const maxChannels = 200;
 
         if (channels.length >= maxChannels) {
@@ -304,14 +298,12 @@ channelSchema.pre("validate", async function (next) {
     next();
 });
 
-channelSchema.pre("remove", async function (next) {
-    const document = this as IChannelDocument;
-
-    if (document.type === ChannelTypes.SERVER_CATEGORY) {
-        const channels = await Channel.find({ server: document.server });
+channelSchema.pre<IChannelDocument>("remove", async function (next) {
+    if (this.type === ChannelTypes.SERVER_CATEGORY) {
+        const channels = await Channel.find({ server: this.server });
 
         const orphans = ChannelUtil.sortByPosition(channels.filter((channel) => !channel.parent && channel.type !== ChannelTypes.SERVER_CATEGORY));
-        const affectedChannels = ChannelUtil.sortByPosition(channels.filter((channel) => channel.parent === document.id));
+        const affectedChannels = ChannelUtil.sortByPosition(channels.filter((channel) => channel.parent === this.id));
 
         const updatedChannels = affectedChannels.map((channel) => {
             channel.parent = null;

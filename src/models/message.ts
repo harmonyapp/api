@@ -66,10 +66,8 @@ const messageSchema = new Schema({
     timestamps: true
 });
 
-messageSchema.pre("validate", function (next) {
-    const document = this as IMessageDocument;
-
-    const content = document.content?.trim();
+messageSchema.pre<IMessageDocument>("validate", function (next) {
+    const content = this.content?.trim();
 
     if (!content) {
         return next(new FieldError("content", ErrorMessages.REQUIRED_FIELD));
