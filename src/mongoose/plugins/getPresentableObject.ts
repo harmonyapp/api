@@ -107,6 +107,12 @@ const getPresentableObject = (schema: Schema): void => {
     };
 
     schema.post(/find*|save/, async function (docs: Document[] | Document, next) {
+        let explicitlyPopulated = null;
+
+        if (this instanceof Query) {
+            explicitlyPopulated = this.getOptions()?.explicitlyPopulated;
+        }
+
         if (!Array.isArray(docs) && !docs) return next();
 
         docs = Array.isArray(docs) ? docs : [docs];
@@ -120,7 +126,9 @@ const getPresentableObject = (schema: Schema): void => {
             doc["$populated"] = doc.toJSON();
 
             for (const field of populateableFields) {
-                doc.depopulate(field);
+                if (!explicitlyPopulated || explicitlyPopulated.indexOf(field) === -1) {
+                    doc.depopulate(field);
+                }
             }
         }
 
@@ -129,6 +137,14 @@ const getPresentableObject = (schema: Schema): void => {
 
     schema.pre(/find|findOne/, function (next) {
         const query = this as Query<unknown>;
+
+        // This method is not documented in mongoose's type declarations file, for some reason.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const explicitlyPopulated = (this as any).getPopulatedPaths();
+
+        query.setOptions({
+            explicitlyPopulated: explicitlyPopulated
+        });
 
         const populateableFields = getPopulateableFields();
 
