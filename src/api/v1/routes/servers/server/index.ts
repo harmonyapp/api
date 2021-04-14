@@ -3,6 +3,7 @@ import serverPolicies from "../../../../../policies/serverPolicies";
 import ServerController from "../../../controllers/servers/server/ServerController";
 import authenticate from "../../../middlewares/authenticate";
 import channels from "./channels";
+import bans from "./bans";
 
 const router = Router();
 
@@ -23,5 +24,6 @@ router.delete("/",
 );
 
 router.use("/channels", channels);
+router.use("/bans", bans);
 
 export default router;

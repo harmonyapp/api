@@ -14,6 +14,7 @@ class InviteController extends BaseController {
 
     public static async useInvite(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
         const invite = req.bus.invite;
+
         const member = await Member.findOne({ server: invite.server, user: req.user.id });
 
         if (member) {
@@ -28,7 +29,7 @@ class InviteController extends BaseController {
         try {
             await newMember.save();
         } catch (error) {
-            next(error);
+            return next(error);
         }
 
         return res.status(HttpStatusCode.CREATED).send();

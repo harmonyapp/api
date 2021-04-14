@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { IApplicationDocument } from "../src/models/application";
+import { IBanDocument } from "../src/models/ban";
 import { IChannelDocument } from "../src/models/channel";
 import { IInviteDocument } from "../src/models/invite";
 import { IMemberDocument } from "../src/models/member";
@@ -18,6 +19,7 @@ declare global {
                 channel?: IChannelDocument;
                 member?: IMemberDocument;
                 invite?: IInviteDocument;
+                ban?: IBanDocument;
             };
             io: Server;
         }
