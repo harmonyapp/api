@@ -15,6 +15,8 @@ declare module "mongoose" {
         "$populated": Record<string, unknown>;
         "$presentables": PresentableField;
 
+        wasNew: boolean;
+
         /**
          * Returns the presentable object, populated and cleaned up, ready to be sent to the client
          */
