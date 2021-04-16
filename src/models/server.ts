@@ -134,18 +134,18 @@ serverSchema.pre<IServerDocument>("validate", function (next) {
     next();
 });
 
-serverSchema.pre<IServerDocument>("save", async function (next) {
-    if (this.isNew) {
+serverSchema.post<IServerDocument>("save", async function (doc, next) {
+    if (doc.wasNew) {
         const defaultCategory = new Channel({
             name: "General",
-            server: this.id,
+            server: doc.id,
             type: ChannelTypes.SERVER_CATEGORY,
             position: 0
         });
 
         const defaultChannel = new Channel({
             name: "general",
-            server: this.id,
+            server: doc.id,
             type: ChannelTypes.SERVER_TEXT,
             position: 0,
             parent: defaultCategory.id
