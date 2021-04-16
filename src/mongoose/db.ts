@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import getPresentableObject from "./plugins/getPresentableObject";
+import wasNew from "./plugins/wasNew";
 
 mongoose.plugin(getPresentableObject);
+mongoose.plugin(wasNew);
 
 const staging = process.env.NODE_ENV === "test";
 
