@@ -2,6 +2,7 @@ process.env.NODE_ENV = "test";
 
 import mongoose from "mongoose";
 import { createStagingConnection, mongoMemoryServer } from "../../src/mongoose/db";
+import { setupDatabase } from "./db";
 
 import { createServer } from "http";
 
@@ -17,6 +18,8 @@ export async function mochaGlobalSetup(): Promise<void> {
     });
 
     await createStagingConnection();
+
+    await setupDatabase();
 
     initialize(this.server);
 }

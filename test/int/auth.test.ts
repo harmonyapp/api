@@ -2,9 +2,10 @@ import chai from "chai";
 import request from "supertest";
 import app from "../../src/api";
 import HttpStatusCode from "../../src/interfaces/HttpStatusCode";
-import validators from "../validators";
 import Session, { ISessionDocument } from "../../src/models/session";
 import User, { IUserDocument } from "../../src/models/user";
+import isValidAuthAttempt from "../validators/isValidAuthAttempt";
+import isOwnAccount from "../validators/isOwnAccount";
 
 describe("Authentication", function () {
     const username = "Eric";
@@ -122,7 +123,7 @@ describe("Authentication", function () {
                 .post("/api/v1/auth/login")
                 .send({ username, password });
 
-            validators.isValidAuthAttempt(response, user);
+            isValidAuthAttempt(response, user);
         });
     });
 
@@ -211,7 +212,7 @@ describe("Authentication", function () {
                 .get("/api/v1/users/@me")
                 .set("Authorization", "Bearer " + session.token);
 
-            validators.isOwnAccount(response, user);
+            isOwnAccount(response, user);
         });
     });
 });
