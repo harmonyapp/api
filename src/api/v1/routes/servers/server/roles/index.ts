@@ -1,27 +1,27 @@
 import { Router } from "express";
-import channelPolicies from "../../../../../../policies/channelPolicies";
-import ServerChannelsController from "../../../../controllers/servers/server/channels/ServerChannelsController";
+import RolesController from "../../../../controllers/servers/server/roles/RolesController";
 import authenticate from "../../../../middlewares/authenticate";
+import findRole from "../../../../middlewares/buses/findRole";
 import checkServerPermissions from "../../../../middlewares/checkServerPermissions";
+import role from "./role";
 
 const router = Router();
 
 router.get("/",
     authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
-    ServerChannelsController.getChannels
+    RolesController.getRoles
 );
 
 router.post("/",
     authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
-    checkServerPermissions({ flag: "MANAGE_CHANNELS" }),
-    channelPolicies.createChannel,
-    ServerChannelsController.createChannel
+    checkServerPermissions({ flag: "MANAGE_ROLES", channelOverwrites: false }),
+    RolesController.createRole
 );
 
-router.patch("/",
+router.use("/:roleID",
     authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
-    checkServerPermissions({ flag: "MANAGE_CHANNELS" }),
-    ServerChannelsController.updateChannels
+    findRole,
+    role
 );
 
 export default router;

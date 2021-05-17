@@ -22,6 +22,8 @@ export async function mochaGlobalSetup(): Promise<void> {
     await setupDatabase();
 
     initialize(this.server);
+
+    console.log = () => { return; };
 }
 
 export async function mochaGlobalTeardown(): Promise<void> {

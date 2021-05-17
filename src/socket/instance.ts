@@ -7,7 +7,7 @@ import { createRedisClient, registerRedisClient } from "../redis/instance";
 let IO_INSTANCE: SocketServer | undefined = undefined;
 
 export function initialize(server: HttpServer): void {
-    IO_INSTANCE = new SocketServer(server);
+    IO_INSTANCE = new SocketServer(server, { cors: { origin: "*" } });
 
     const pubClient = createRedisClient({ url: process.env.REDIS_URI, prefix: "socketio" });
     const subClient = pubClient.duplicate();

@@ -1,5 +1,10 @@
 import mongoose, { Schema, Model, Document } from "mongoose";
+import FieldError from "../errors/FieldError";
+import GenericError from "../errors/GenericError";
+import isNumeric from "../helpers/isNumeric";
 import snowflake from "../helpers/snowflake";
+import { DefaultPermissions } from "../util/Constants";
+import PermissionUtil from "../util/PermissionUtil";
 
 export type IRoleModel = Model<IRoleDocument>;
 
@@ -15,7 +20,16 @@ export interface IRoleDocument extends Document {
     /**
      * The bits representing the users permissions
      */
-    permissions: string;
+    permissions: number;
+    /**
+     * Whether or not this role is managed
+     */
+    managed: boolean;
+    /**
+     * The position of this role.
+     * <note>The higher the position, the higher the authority.</note>
+     */
+    position: number;
     /**
      * The server that this role belongs to
      */
@@ -40,8 +54,19 @@ const roleSchema = new Schema({
         required: true
     },
     permissions: {
-        type: Schema.Types.String,
-        required: true
+        type: Schema.Types.Number,
+        required: true,
+        default: DefaultPermissions
+    },
+    managed: {
+        type: Schema.Types.Boolean,
+        required: true,
+        default: false
+    },
+    position: {
+        type: Schema.Types.Number,
+        required: true,
+        default: 0
     },
     server: {
         type: Schema.Types.String,
@@ -52,11 +77,35 @@ const roleSchema = new Schema({
     timestamps: true
 });
 
+roleSchema.pre<IRoleDocument>("validate", function (next) {
+    const name = this.name?.trim();
+
+    if (!name) {
+        return next(new FieldError("name", "This field is required"));
+    }
+
+    if (name.length < 1 || name.length > 24) {
+        return next(new FieldError("name", "Role name must be between 1 and 24 in length"));
+    }
+
+    if (!isNumeric(this.permissions)) {
+        return next(new FieldError("permissions", "This field must be numeric"));
+    }
+
+    if (!this.permissions || !PermissionUtil.validatePermissions(this.permissions)) {
+        return next(new GenericError("Invalid permissions"));
+    }
+
+    return next();
+});
+
 const Role: IRoleModel = mongoose.model<IRoleDocument, IRoleModel>("Role", roleSchema);
 
 Role.setPresentableFields({
     name: true,
     permissions: true,
+    managed: true,
+    position: true,
     server: {
         populate: true
     }

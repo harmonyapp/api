@@ -5,8 +5,9 @@ import GenericError from "../errors/GenericError";
 import snowflake from "../helpers/snowflake";
 import HttpStatusCode from "../interfaces/HttpStatusCode";
 import User from "./user";
-import { ChannelTypes } from "../util/Constants";
-import ChannelUtil from "../util/ChannelUtil";
+import { ChannelOverwriteTypes, ChannelTypes } from "../util/Constants";
+import PositionUtil from "../util/PositionUtil";
+import PermissionUtil from "../util/PermissionUtil";
 
 export type IChannelModel = Model<IChannelDocument>;
 
@@ -74,6 +75,15 @@ export interface IChannelDocument extends Document {
      * <note>Only available on Group DM Channels</note>
      */
     owner?: string;
+    /**
+     * The permission overwrites for this channel
+     */
+    permission_overwrites: {
+        id: string;
+        type: typeof ChannelOverwriteTypes.ROLE | typeof ChannelOverwriteTypes.ROLE;
+        allow: number;
+        deny: number;
+    }[];
     /**
      * The date this document was created at
      */
@@ -156,7 +166,25 @@ const channelSchema = new Schema({
     owner: {
         type: Schema.Types.String,
         ref: "User"
-    }
+    },
+    permission_overwrites: [{
+        id: {
+            type: Schema.Types.String
+        },
+        type: {
+            type: Schema.Types.Number,
+            enum: [
+                ChannelOverwriteTypes.ROLE,
+                ChannelOverwriteTypes.MEMBER
+            ]
+        },
+        allow: {
+            type: Schema.Types.Number
+        },
+        deny: {
+            type: Schema.Types.Number
+        }
+    }]
 }, {
     timestamps: true
 });
@@ -204,7 +232,7 @@ channelSchema.methods.isSwappableWith = function (this: IChannelDocument, type: 
 };
 
 channelSchema.pre<IChannelDocument>("validate", async function (next) {
-    const { name, topic, nsfw, position, type, parent, recipients, server } = this;
+    const { name, topic, nsfw, position, type, parent, recipients, server, permission_overwrites } = this;
 
     const channels = await Channel.find({ server: server });
 
@@ -295,6 +323,18 @@ channelSchema.pre<IChannelDocument>("validate", async function (next) {
         }
     }
 
+    if (permission_overwrites) {
+        for (const permission_overwrite of permission_overwrites) {
+            if (permission_overwrite.allow && !PermissionUtil.validatePermissions(permission_overwrite.allow)) {
+                return next(new FieldError("allow", "Invalid permission"));
+            }
+
+            if (permission_overwrite.deny && !PermissionUtil.validatePermissions(permission_overwrite.deny)) {
+                return next(new FieldError("deny", "Invalid permission"));
+            }
+        }
+    }
+
     next();
 });
 
@@ -302,8 +342,8 @@ channelSchema.pre<IChannelDocument>("remove", async function (next) {
     if (this.type === ChannelTypes.SERVER_CATEGORY) {
         const channels = await Channel.find({ server: this.server });
 
-        const orphans = ChannelUtil.sortByPosition(channels.filter((channel) => !channel.parent && channel.type !== ChannelTypes.SERVER_CATEGORY));
-        const affectedChannels = ChannelUtil.sortByPosition(channels.filter((channel) => channel.parent === this.id));
+        const orphans = PositionUtil.sortByPosition(channels.filter((channel) => !channel.parent && channel.type !== ChannelTypes.SERVER_CATEGORY));
+        const affectedChannels = PositionUtil.sortByPosition(channels.filter((channel) => channel.parent === this.id));
 
         const updatedChannels = affectedChannels.map((channel) => {
             channel.parent = null;
@@ -311,7 +351,7 @@ channelSchema.pre<IChannelDocument>("remove", async function (next) {
             return channel;
         });
 
-        ChannelUtil.flattenChannels(ChannelUtil.bumpChannels([...orphans, ...updatedChannels]));
+        PositionUtil.flatten(PositionUtil.bump([...orphans, ...updatedChannels]));
 
         await Channel.bulkWrite(updatedChannels.map((channel) => {
             return {

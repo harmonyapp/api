@@ -4,6 +4,7 @@ import BaseController from "../../BaseController";
 import HttpStatusCode from "../../../../../interfaces/HttpStatusCode";
 import GenericError from "../../../../../errors/GenericError";
 import ErrorMessages from "../../../../../errors/Messages";
+import Server from "../../../../../models/server";
 import { ControllerReturnPromise } from "../../../../../interfaces/ControllerReturn";
 
 class ServerController extends BaseController {
@@ -20,11 +21,13 @@ class ServerController extends BaseController {
 
         try {
             await server.save();
-
-            return res.status(HttpStatusCode.OK).send({ server });
         } catch (error) {
             return next(error);
         }
+
+        const updatedServer = await Server.findOne({ _id: server.id });
+
+        return res.send({ server: updatedServer });
     }
 
     public static async deleteServer(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {

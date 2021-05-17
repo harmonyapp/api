@@ -10,6 +10,7 @@ import debug from "../../helpers/debug";
 import BaseError from "../../errors/BaseError";
 import GenericError from "../../errors/GenericError";
 import { getIOInstance } from "../../socket/instance";
+import authenticate from "./middlewares/authenticate";
 
 const router = Router();
 
@@ -24,6 +25,8 @@ router.use((req, res, next) => {
 
     next();
 });
+
+router.use(authenticate({ required: false }));
 
 // Base routes
 router.use("/auth", auth);

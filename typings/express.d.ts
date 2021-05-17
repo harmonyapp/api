@@ -4,6 +4,7 @@ import { IBanDocument } from "../src/models/ban";
 import { IChannelDocument } from "../src/models/channel";
 import { IInviteDocument } from "../src/models/invite";
 import { IMemberDocument } from "../src/models/member";
+import { IRoleDocument } from "../src/models/role";
 import { IServerDocument } from "../src/models/server";
 import { ISessionDocument } from "../src/models/session";
 import { IUserDocument } from "../src/models/user";
@@ -16,10 +17,12 @@ declare global {
             bus: {
                 user?: IUserDocument;
                 server?: IServerDocument;
+                server_member?: IMemberDocument;
                 channel?: IChannelDocument;
                 member?: IMemberDocument;
                 invite?: IInviteDocument;
                 ban?: IBanDocument;
+                role?: IRoleDocument;
             };
             io: Server;
         }

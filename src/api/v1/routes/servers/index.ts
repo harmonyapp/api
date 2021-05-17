@@ -18,7 +18,7 @@ router.post("/",
 
 router.use("/:serverID",
     authenticate({ required: true, allowApplications: false }),
-    findServer,
+    findServer(),
     server
 );
 

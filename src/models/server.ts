@@ -3,7 +3,8 @@ import config from "../../config/config";
 import FieldError from "../errors/FieldError";
 import snowflake from "../helpers/snowflake";
 import Member from "./member";
-import ChannelUtil from "../util/ChannelUtil";
+import Role from "./role";
+import PositionUtil from "../util/PositionUtil";
 import Channel, { IChannelDocument } from "./channel";
 import { ChannelTypes } from "../util/Constants";
 
@@ -90,13 +91,13 @@ serverSchema.methods.mendChannelPositions = async function (this: IServerDocumen
 
     const orphans = serverChannels.filter((channel) => !channel.parent && channel.type !== ChannelTypes.SERVER_CATEGORY);
 
-    ChannelUtil.flattenChannels(categories);
-    ChannelUtil.flattenChannels(orphans);
+    PositionUtil.flatten(categories);
+    PositionUtil.flatten(orphans);
 
     for (const category of categories) {
         const categoryChannels = channels.filter((channel) => channel.parent === category.id);
 
-        ChannelUtil.flattenChannels(categoryChannels);
+        PositionUtil.flatten(categoryChannels);
     }
 
     if (save) {
@@ -153,6 +154,15 @@ serverSchema.post<IServerDocument>("save", async function (doc, next) {
 
         await defaultCategory.save();
         await defaultChannel.save();
+
+        const defaultRole = new Role({
+            _id: doc.id,
+            name: "everyone",
+            server: doc.id,
+            managed: true
+        });
+
+        await defaultRole.save();
     }
 
     next();

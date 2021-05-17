@@ -1,6 +1,6 @@
 import { check } from "express-validator";
 
-const fields = ["name", "topic", "nsfw", "server", "position", "parent", "last_message", "recipient", "recipients", "icon", "owner", "bitrate", "user_limit"];
+const fields = ["name", "topic", "nsfw", "position", "parent", "bitrate", "user_limit"];
 
 const channelPolicies = {
     createChannel: [

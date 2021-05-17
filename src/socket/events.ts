@@ -3,6 +3,8 @@ import SocketExtended from "../interfaces/Socket";
 import authenticate from "../api/v1/middlewares/authenticate";
 import Member from "../models/member";
 import { SocketEvents } from "../util/Constants";
+import Channel from "../models/channel";
+import Role from "../models/role";
 
 const wrap = (middleware) => (socket, next) => middleware(socket.request, {}, next);
 
@@ -22,10 +24,14 @@ const socketEvents = (io: SocketServer): void => {
     io.on("connection", async (socket: SocketExtended) => {
         const user = socket.request.user;
         const members = await Member.find({ user: user.id }).populate("server").exec();
+        const channels = await Channel.find({ server: { $in: members.map((member) => member.server) } });
+        const roles = await Role.find({ server: { $in: members.map((member) => member.server) } });
 
         const data = {
             user: user,
-            servers: members.map((member) => member.server)
+            servers: members.map((member) => member.server),
+            channels: channels,
+            roles: roles
         };
 
         socket.emit(SocketEvents.READY, data);
