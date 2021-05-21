@@ -18,7 +18,7 @@ describe("Servers", function () {
             this.slow(150);
 
             const response = await request(app)
-                .post("/api/v1/servers")
+                .post("/servers")
                 .set("Authorization", "Bearer " + raymond_session.token)
                 .send({
                     name: "Raymond's Server"
@@ -37,7 +37,7 @@ describe("Servers", function () {
             this.slow(150);
 
             const response = await request(app)
-                .get("/api/v1/servers/" + raymonds_temp_server.id + "/channels")
+                .get("/servers/" + raymonds_temp_server.id + "/channels")
                 .set("Authorization", "Bearer " + raymond_session.token);
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.OK);
@@ -67,7 +67,7 @@ describe("Servers", function () {
             await invite.save();
 
             const response = await request(app)
-                .post("/api/v1/invites/" + invite.code)
+                .post("/invites/" + invite.code)
                 .set("Authorization", "Bearer " + dembe_session.token)
                 .send({
                     name: "Raymond's Server"
@@ -76,7 +76,7 @@ describe("Servers", function () {
             chai.expect(response.status).to.be.equal(HttpStatusCode.CREATED);
 
             const response2 = await request(app)
-                .get("/api/v1/servers")
+                .get("/servers")
                 .set("Authorization", "Bearer " + dembe_session.token);
 
             chai.expect(response2.status).to.be.equal(HttpStatusCode.OK);
@@ -95,13 +95,13 @@ describe("Servers", function () {
             this.slow(250);
 
             const response = await request(app)
-                .delete("/api/v1/servers/" + raymonds_temp_server.id)
+                .delete("/servers/" + raymonds_temp_server.id)
                 .set("Authorization", "Bearer " + dembe_session.token);
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.FORBIDDEN);
 
             const response2 = await request(app)
-                .get("/api/v1/servers/" + raymonds_temp_server.id)
+                .get("/servers/" + raymonds_temp_server.id)
                 .set("Authorization", "Bearer " + dembe_session.token);
 
             chai.expect(response2.body).to.haveOwnProperty("server");
@@ -113,7 +113,7 @@ describe("Servers", function () {
             this.slow(250);
 
             const response = await request(app)
-                .delete("/api/v1/servers/" + raymonds_temp_server.id)
+                .delete("/servers/" + raymonds_temp_server.id)
                 .set("Authorization", "Bearer " + raymond_session.token);
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.OK);

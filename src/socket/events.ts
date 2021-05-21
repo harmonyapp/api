@@ -1,6 +1,6 @@
 import { Server as SocketServer } from "socket.io";
 import SocketExtended from "../interfaces/Socket";
-import authenticate from "../api/v1/middlewares/authenticate";
+import authenticate from "../api/app/middlewares/authenticate";
 import Member from "../models/member";
 import { SocketEvents } from "../util/Constants";
 import Channel from "../models/channel";

@@ -9,7 +9,7 @@ describe("Users", function () {
     describe("Fetching your own account", function () {
         it("fetches your own account", async function () {
             const response = await request(app)
-                .get("/api/v1/users/@me")
+                .get("/users/@me")
                 .set("Authorization", "Bearer " + dembe_session.token);
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.OK);
@@ -23,7 +23,7 @@ describe("Users", function () {
     describe("Fetching someone else's account", function () {
         it("does not fetch an unknown account", async function () {
             const response = await request(app)
-                .get("/api/v1/users/randomInvalidID")
+                .get("/users/randomInvalidID")
                 .set("Authorization", "Bearer " + dembe_session.token);
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.NOT_FOUND);
@@ -31,7 +31,7 @@ describe("Users", function () {
 
         it("does fetch a valid account", async function () {
             const response = await request(app)
-                .get("/api/v1/users/" + user_raymond.id)
+                .get("/users/" + user_raymond.id)
                 .set("Authorization", "Bearer " + dembe_session.token);
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.OK);

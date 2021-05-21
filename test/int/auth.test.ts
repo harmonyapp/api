@@ -20,18 +20,18 @@ describe("Authentication", function () {
             this.slow(100);
 
             const response = await request(app)
-                .get("/api/v1/users/@me");
+                .get("/users/@me");
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.UNAUTHORIZED);
 
             const response2 = await request(app)
-                .get("/api/v1/users/@me")
+                .get("/users/@me")
                 .set("Authorization", "Bearer invalid-token");
 
             chai.expect(response2.status).to.be.equal(HttpStatusCode.UNAUTHORIZED);
 
             const response3 = await request(app)
-                .get("/api/v1/users/@me")
+                .get("/users/@me")
                 .set("Authorization", "Bot invalid-token");
 
             chai.expect(response3.status).to.be.equal(HttpStatusCode.UNAUTHORIZED);
@@ -41,7 +41,7 @@ describe("Authentication", function () {
             this.slow(1000);
 
             const response = await request(app)
-                .post("/api/v1/auth/register")
+                .post("/auth/register")
                 .send({ username, email, password });
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.CREATED);
@@ -68,7 +68,7 @@ describe("Authentication", function () {
             this.slow(100);
 
             const response = await request(app)
-                .get("/api/v1/users/@me")
+                .get("/users/@me")
                 .set("Authorization", "Bearer " + token);
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.OK);
@@ -93,7 +93,7 @@ describe("Authentication", function () {
 
             // Invalid username and password
             const response = await request(app)
-                .post("/api/v1/auth/login")
+                .post("/auth/login")
                 .send({
                     username: "nonexistent",
                     password: "someinvalidpwd"
@@ -101,7 +101,7 @@ describe("Authentication", function () {
 
             // Valid username, but invalid password
             const response2 = await request(app)
-                .post("/api/v1/auth/login")
+                .post("/auth/login")
                 .send({
                     username: username,
                     password: "someinvalidpwd"
@@ -120,7 +120,7 @@ describe("Authentication", function () {
             this.slow(1000);
 
             const response = await request(app)
-                .post("/api/v1/auth/login")
+                .post("/auth/login")
                 .send({ username, password });
 
             isValidAuthAttempt(response, user);
@@ -139,7 +139,7 @@ describe("Authentication", function () {
 
             // Logout for session 1
             const response = await request(app)
-                .post("/api/v1/auth/logout")
+                .post("/auth/logout")
                 .set("Authorization", `Bearer ${sessions[0].token}`);
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.NO_CONTENT);
@@ -147,14 +147,14 @@ describe("Authentication", function () {
             // Make sure session 1 was logged out and not session 2 and 3
 
             const response2 = await request(app)
-                .get("/api/v1/users/@me")
+                .get("/users/@me")
                 .set("Authorization", `Bearer ${sessions[0].token}`);
 
             chai.expect(response2.status).to.be.equal(HttpStatusCode.UNAUTHORIZED);
 
             for (const session of [sessions[1], sessions[2], sessions[3]]) {
                 const response3 = await request(app)
-                    .get("/api/v1/users/@me")
+                    .get("/users/@me")
                     .set("Authorization", `Bearer ${session.token}`);
 
                 chai.expect(response3.status).to.be.equal(HttpStatusCode.OK);
@@ -165,14 +165,14 @@ describe("Authentication", function () {
             const sessions: ISessionDocument[] = this.sessions;
 
             const response = await request(app)
-                .post("/api/v1/auth/logout?signOutAll")
+                .post("/auth/logout?signOutAll")
                 .set("Authorization", `Bearer ${sessions[1].token}`);
 
             chai.expect(response.status).to.be.equal(HttpStatusCode.NO_CONTENT);
 
             for (const session of [sessions[2], sessions[3]]) {
                 const response2 = await request(app)
-                    .get("/api/v1/users/@me")
+                    .get("/users/@me")
                     .set("Authorization", `Bearer ${session.token}`);
 
                 chai.expect(response2.status).to.be.equal(HttpStatusCode.UNAUTHORIZED);
@@ -184,17 +184,17 @@ describe("Authentication", function () {
         it("doesn't access restricted endpoint without authentication", async function () {
             // A token is provided, but it has no valid prefix and the rest of the token is invalid
             const response1 = await request(app)
-                .get("/api/v1/users/@me")
+                .get("/users/@me")
                 .set("Authorization", "completely invalid token");
 
             // A token is provided, and it has a valid prefix, but the token is not valid
             const response2 = await request(app)
-                .get("/api/v1/users/@me")
+                .get("/users/@me")
                 .set("Authorization", "Bearer valid-prefix-but-invalid-token");
 
             // No token and no header is provided at all
             const response3 = await request(app)
-                .get("/api/v1/users/@me");
+                .get("/users/@me");
 
             const responses = [response1, response2, response3];
 
@@ -209,7 +209,7 @@ describe("Authentication", function () {
             await session.save();
 
             const response = await request(app)
-                .get("/api/v1/users/@me")
+                .get("/users/@me")
                 .set("Authorization", "Bearer " + session.token);
 
             isOwnAccount(response, user);

@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import auth from "./routes/auth";
 import users from "./routes/users";
 import invites from "./routes/invites";
@@ -12,9 +12,9 @@ import GenericError from "../../errors/GenericError";
 import { getIOInstance } from "../../socket/instance";
 import authenticate from "./middlewares/authenticate";
 
-const router = Router();
+const app = express();
 
-router.use((req, res, next) => {
+app.use((req, res, next) => {
     const io = getIOInstance();
 
     req.io = io;
@@ -26,17 +26,17 @@ router.use((req, res, next) => {
     next();
 });
 
-router.use(authenticate({ required: false }));
+app.use(authenticate({ required: false }));
 
 // Base routes
-router.use("/auth", auth);
-router.use("/users", users);
-router.use("/invites", invites);
-router.use("/servers", servers);
-router.use("/channels", channels);
-router.use("/applications", applications);
+app.use("/auth", auth);
+app.use("/users", users);
+app.use("/invites", invites);
+app.use("/servers", servers);
+app.use("/channels", channels);
+app.use("/applications", applications);
 
-router.use((err: BaseError, req: Request, res: Response, next: NextFunction) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+app.use((err: BaseError, req: Request, res: Response, next: NextFunction) => { // eslint-disable-line @typescript-eslint/no-unused-vars
     debug("Got error:", err);
 
     if (!(err instanceof BaseError)) {
@@ -50,8 +50,8 @@ router.use((err: BaseError, req: Request, res: Response, next: NextFunction) => 
     res.status(err.httpStatusCode).send(data);
 });
 
-router.use((req, res) => {
+app.use((req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send();
 });
 
-export default router;
+export default app;

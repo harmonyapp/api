@@ -1,16 +1,14 @@
 import cors from "cors";
-import express, { Router } from "express";
-import v1 from "./v1";
-import ratelimit from "./v1/middlewares/ratelimit";
+import express from "express";
+import api from "./app";
+import ratelimit from "./app/middlewares/ratelimit";
 
 const app = express();
-const api = Router();
 
 app.use(express.json());
 app.use(cors());
 
-api.use("/v1", v1);
-app.use("/api", ratelimit({ windowMs: 16000, max: 96 }));
-app.use("/api", api);
+app.use("/", ratelimit({ windowMs: 16000, max: 96 }));
+app.use("/", api);
 
 export default app;

@@ -11,7 +11,7 @@ describe("Channels", function () {
             this.slow(250);
 
             const response = await request(app)
-                .post("/api/v1/servers/" + dembes_server.id + "/channels")
+                .post("/servers/" + dembes_server.id + "/channels")
                 .set("Authorization", "Bearer " + dembe_session.token)
                 .send({
                     type: 1,
