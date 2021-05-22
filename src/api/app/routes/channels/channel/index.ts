@@ -37,7 +37,7 @@ router.delete("/",
 router.post("/invites",
     authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
     findChannel({
-        type: ChannelTypes.SERVER_TEXT
+        types: [ChannelTypes.SERVER_TEXT]
     }),
     checkServerPermissions({ flag: "CREATE_INVITE", channelOverwrites: true }),
     ChannelController.createInvite

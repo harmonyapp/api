@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { ChannelTypes } from "../../../../util/Constants";
+import authenticate from "../../middlewares/authenticate";
 import findChannel from "../../middlewares/buses/findChannel";
 import channel from "./channel";
+import { ChannelTypes } from "../../../../util/Constants";
 
 const router = Router();
 
 router.use("/:channelID",
-    findChannel({
-        types: Object.values(ChannelTypes)
-    }),
+    authenticate({ required: true }),
+    findChannel({ types: Object.values(ChannelTypes) }),
     channel
 );
 
