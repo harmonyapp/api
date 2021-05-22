@@ -68,14 +68,11 @@ class MyRelationshipsController extends BaseController {
             return res.status(HttpStatusCode.NO_CONTENT).send();
         }
 
-        if (existingConcerningRelationship) {
-            // If the user trying to befriend has been blocked. We can still proceed if we are trying to block them (mutual blocking)
-            if (existingConcerningRelationship.type === RelationshipTypes.BLOCK && type !== RelationshipTypes.BLOCK) {
-                return res.status(HttpStatusCode.BAD_REQUEST).send();
-            }
+        // By this point, we have asserted that the relationship type is a friend request
 
+        if (existingConcerningRelationship) {
             // If we try to befriend someone that has an outgoing friend request to us
-            if (existingConcerningRelationship.type === RelationshipTypes.OUTGOING_FRIEND_REQUEST && type === RelationshipTypes.FRIEND) {
+            if (existingConcerningRelationship.type === RelationshipTypes.OUTGOING_FRIEND_REQUEST) {
                 existingConcerningRelationship.type = RelationshipTypes.FRIEND;
                 existingRelationship.type = RelationshipTypes.FRIEND;
 
@@ -85,9 +82,12 @@ class MyRelationshipsController extends BaseController {
                 return res.status(HttpStatusCode.NO_CONTENT).send();
             }
 
-            if (existingConcerningRelationship.type === type) return res.status(HttpStatusCode.NO_CONTENT).send();
+            // If we try to befriend someone that has blocked us
+            if (existingConcerningRelationship.type === RelationshipTypes.BLOCK) {
+                return res.status(HttpStatusCode.BAD_REQUEST).send();
+            }
 
-            existingConcerningRelationship.type = type;
+            existingRelationship.type = RelationshipTypes.OUTGOING_FRIEND_REQUEST;
 
             await existingConcerningRelationship.save();
 
