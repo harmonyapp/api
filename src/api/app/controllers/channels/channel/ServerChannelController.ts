@@ -4,6 +4,7 @@ import BaseController from "../../BaseController";
 import Invite from "../../../../../models/invite";
 import HttpStatusCode from "../../../../../interfaces/HttpStatusCode";
 import Server from "../../../../../models/server";
+import Channel from "../../../../../models/channel";
 import { ControllerReturnPromise } from "../../../../../interfaces/ControllerReturn";
 import { ChannelTypes } from "../../../../../util/Constants";
 
@@ -26,7 +27,9 @@ class ChannelController extends BaseController {
             return next(error);
         }
 
-        return res.send({ channel });
+        const updatedChannel = await Channel.findOne({ _id: channel.id });
+
+        return res.send({ channel: updatedChannel });
     }
 
     public static async deleteChannel(req: Request, res: Response, next: NextFunction): ControllerReturnPromise {
