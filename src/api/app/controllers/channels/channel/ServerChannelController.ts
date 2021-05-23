@@ -1,10 +1,10 @@
 import { Response, Request, NextFunction } from "express";
 import { matchedData } from "express-validator";
 import BaseController from "../../BaseController";
-import { ControllerReturnPromise } from "../../../../../interfaces/ControllerReturn";
 import Invite from "../../../../../models/invite";
 import HttpStatusCode from "../../../../../interfaces/HttpStatusCode";
 import Server from "../../../../../models/server";
+import { ControllerReturnPromise } from "../../../../../interfaces/ControllerReturn";
 import { ChannelTypes } from "../../../../../util/Constants";
 
 class ChannelController extends BaseController {

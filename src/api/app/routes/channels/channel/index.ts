@@ -1,7 +1,8 @@
 import { Router } from "express";
 import channelPolicies from "../../../../../policies/channelPolicies";
 import { ChannelTypes } from "../../../../../util/Constants";
-import ChannelController from "../../../controllers/channels/channel/ChannelController";
+import ServerChannelController from "../../../controllers/channels/channel/ServerChannelController";
+import DMChannelController from "../../../controllers/channels/channel/DMChannelController";
 import authenticate from "../../../middlewares/authenticate";
 import findChannel from "../../../middlewares/buses/findChannel";
 import checkServerPermissions from "../../../middlewares/checkServerPermissions";
@@ -9,39 +10,86 @@ import messages from "./messages";
 
 const router = Router();
 
+//#region ServerChannels
+
 router.get("/",
-    authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
-    ChannelController.getChannel
-);
-
-router.patch("/",
-    authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
-    checkServerPermissions({ flag: "MANAGE_CHANNELS", channelOverwrites: true }),
-    channelPolicies.updateChannel,
-    ChannelController.updateChannel
-);
-
-router.delete("/",
-    authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
+    authenticate({ required: true }),
     findChannel({
         types: [
             ChannelTypes.SERVER_TEXT,
             ChannelTypes.SERVER_VOICE,
             ChannelTypes.SERVER_CATEGORY
-        ]
+        ],
+        passthrough: true
+    }),
+    ServerChannelController.getChannel
+);
+
+router.patch("/",
+    authenticate({ required: true }),
+    findChannel({
+        types: [
+            ChannelTypes.SERVER_TEXT,
+            ChannelTypes.SERVER_VOICE,
+            ChannelTypes.SERVER_CATEGORY
+        ],
+        passthrough: true
     }),
     checkServerPermissions({ flag: "MANAGE_CHANNELS", channelOverwrites: true }),
-    ChannelController.deleteChannel
+    channelPolicies.updateChannel,
+    ServerChannelController.updateChannel
+);
+
+router.delete("/",
+    authenticate({ required: true }),
+    findChannel({
+        types: [
+            ChannelTypes.SERVER_TEXT,
+            ChannelTypes.SERVER_VOICE,
+            ChannelTypes.SERVER_CATEGORY
+        ],
+        passthrough: true
+    }),
+    checkServerPermissions({ flag: "MANAGE_CHANNELS", channelOverwrites: true }),
+    ServerChannelController.deleteChannel
 );
 
 router.post("/invites",
-    authenticate({ required: true, allowApplications: true, scopes: ["servers.read"] }),
+    authenticate({ required: true }),
     findChannel({
         types: [ChannelTypes.SERVER_TEXT]
     }),
     checkServerPermissions({ flag: "CREATE_INVITE", channelOverwrites: true }),
-    ChannelController.createInvite
+    ServerChannelController.createInvite
 );
+
+//#endregion
+
+//#region DMChannels
+
+router.get("/",
+    authenticate({ required: true }),
+    findChannel({
+        types: [
+            ChannelTypes.DM,
+            ChannelTypes.GROUP_DM
+        ]
+    }),
+    DMChannelController.getChannel
+);
+
+router.delete("/",
+    authenticate({ required: true }),
+    findChannel({
+        types: [
+            ChannelTypes.DM,
+            ChannelTypes.GROUP_DM
+        ]
+    }),
+    DMChannelController.deleteChannel
+);
+
+//#endregion
 
 router.use("/messages", messages);
 

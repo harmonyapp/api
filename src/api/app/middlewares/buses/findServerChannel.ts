@@ -10,7 +10,6 @@ const findServerChannel = async (req: Request, res: Response, next: NextFunction
     const server = await Server.findOne({ _id: channel.server });
     const member = await Member.findOne({ server: server.id, user: user.id });
 
-
     if (!member) {
         return next(new GenericError("You are not a member of this server"));
     }
@@ -18,6 +17,9 @@ const findServerChannel = async (req: Request, res: Response, next: NextFunction
     if (!await member.hasPermission("VIEW_CHANNEL", { server, channel })) {
         return next(new GenericError("You don't have permission to interact with this channel"));
     }
+
+    req.bus.server = server;
+    req.bus.server_member = member;
 
     return next();
 };

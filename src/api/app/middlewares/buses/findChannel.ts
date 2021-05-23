@@ -18,7 +18,8 @@ const getChannel = async (req: Request) => {
 };
 
 function findChannel(options: {
-    types?: ChannelType[]
+    types?: ChannelType[],
+    passthrough?: boolean
 }) {
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const channel = await getChannel(req);
@@ -30,6 +31,10 @@ function findChannel(options: {
         }
 
         if ((options.types && options.types.indexOf(channel.type) === -1)) {
+            if (options.passthrough) {
+                return next("route");
+            }
+
             return next(new GenericError("Channel type not supported for this endpoint"));
         }
 
