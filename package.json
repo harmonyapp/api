@@ -26,7 +26,7 @@
     "flake-idgen": "^1.4.0",
     "mongoose": "^5.10.15",
     "rate-limit-redis": "^2.0.0",
-    "redis": "^3.0.2",
+    "redis": "^3.1.2",
     "redis-mock": "^0.56.3",
     "socket.io": "^3.0.4",
     "socket.io-redis": "^6.0.1",
