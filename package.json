@@ -22,7 +22,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.3",
-    "express-validator": "^6.8.0",
+    "express-validator": "^6.11.1",
     "flake-idgen": "^1.4.0",
     "mongoose": "^5.10.15",
     "rate-limit-redis": "^2.0.0",
